@@ -1,13 +1,14 @@
 package com.project.casualtalkchat.common;
 
 import com.vaadin.flow.component.Unit;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Anchor;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.server.StreamResource;
 
+//@CssImport("./styles.css")
 public class NavigationBar extends HorizontalLayout {
 
     public NavigationBar() {
@@ -16,7 +17,6 @@ public class NavigationBar extends HorizontalLayout {
                 () -> getClass().getResourceAsStream("/images/logo.png"));
 
         Image logo = new Image(logoResource, "CasualTalk logo");
-//        logo.setClassName("img-fluid");
         logo.setWidth(118, Unit.PIXELS);
         logo.setHeight(36, Unit.PIXELS);
         Anchor homeLinkLogo = new Anchor("", "");
@@ -26,7 +26,6 @@ public class NavigationBar extends HorizontalLayout {
         Anchor contactLink = new Anchor("#contact", "Contact");
 
         MenuBar leftMenuBar = new MenuBar();
-//        leftMenuBar.addItem(logo);
         leftMenuBar.addItem(homeLink);
         leftMenuBar.addItem(aboutLink);
         leftMenuBar.addItem(contactLink);
@@ -38,6 +37,6 @@ public class NavigationBar extends HorizontalLayout {
         HorizontalLayout div = new HorizontalLayout(homeLinkLogo, leftMenuBar);
 
         // Add the links to the navigation bar
-        add(div, rightMenuBar /*logo, homeLink, aboutLink, contactLink*/);
+        add(div, rightMenuBar);
     }
 }
