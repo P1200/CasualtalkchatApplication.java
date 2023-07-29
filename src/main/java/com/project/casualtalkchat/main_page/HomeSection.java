@@ -20,32 +20,38 @@ public class HomeSection extends Section {
 
     private Component getImagePart() {
 
-        StreamResource imageResource = new StreamResource("pngwing.com (1).png",
-                () -> getClass().getResourceAsStream("/images/pngwing.com (1).png"));
-
-        Image animatedImage = new Image(imageResource, "Woman chatting with someone");
-        animatedImage.setClassName("img-fluid animated");
-
-        Div imagePart = new Div(animatedImage);
+        Div imagePart = new Div(getAnimatedImage());
         imagePart.setClassName("col-lg-6 order-1 order-lg-2 hero-img");
 
         return imagePart;
     }
 
+    private Image getAnimatedImage() {
+        StreamResource imageResource = new StreamResource("pngwing.com (1).png",
+                () -> getClass().getResourceAsStream("/images/pngwing.com (1).png"));
+
+        Image animatedImage = new Image(imageResource, "Woman chatting with someone");
+        animatedImage.setClassName("img-fluid animated");
+        return animatedImage;
+    }
+
     private Component getIncentivePartComponent() {
 
-        NativeButton registrationButton = new NativeButton("Register now!");
-        NativeButton loginButton = new NativeButton("Login now!");
-
-        Div buttons = new Div(registrationButton, loginButton);
-        buttons.setClassName("d-flex");
-
-        H1 slogan = new H1("Chat with every!");
-        H2 shortProductDescription = new H2("The best web chat application on the market");
-
-        Div incentivePart = new Div(slogan, shortProductDescription, buttons);
+        Div incentivePart = new Div(new H1("Chat with every!"),
+                new H2("The best web chat application on the market"), getNavigationButtons());
         incentivePart.setClassName("col-lg-6 pt-5 pt-lg-0 order-2 order-lg-1 d-flex flex-column justify-content-center");
 
         return incentivePart;
+    }
+
+    private Div getNavigationButtons() {
+        Anchor registrationButton = new Anchor("", "Register now!");
+        registrationButton.setClassName("register-button");
+        Anchor loginButton = new Anchor("", "Login now!");
+        loginButton.setClassName("login-button");
+
+        Div buttons = new Div(registrationButton, loginButton);
+        buttons.setClassName("d-flex");
+        return buttons;
     }
 }

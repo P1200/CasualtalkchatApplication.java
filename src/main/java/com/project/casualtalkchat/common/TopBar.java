@@ -20,9 +20,9 @@ public class TopBar extends HorizontalLayout {
         this.setWidth(100, Unit.PERCENTAGE);
 
         Anchor linkToLogin = new Anchor("#Login", "Login");
-        linkToLogin.setClassName("nav-link");
+        linkToLogin.setClassName("nav-link login-button");
         Anchor linkToRegistration = new Anchor("#Registration", "Registration");
-        linkToRegistration.setClassName("nav-link");
+        linkToRegistration.setClassName("nav-link register-button");
 
         ListItem loginItem = new ListItem(linkToLogin);
         ListItem registrationItem = new ListItem(linkToRegistration);
@@ -30,20 +30,38 @@ public class TopBar extends HorizontalLayout {
         UnorderedList accountLinks = new UnorderedList(loginItem, registrationItem);
         accountLinks.setClassName("navbar-nav ms-auto");
 
-        Anchor linkToHome = new Anchor("#home", "Home");
-        linkToHome.setClassName("nav-link scrollto");
-        Anchor linkToAbout = new Anchor("#about", "About");
-        linkToAbout.setClassName("nav-link scrollto");
-        Anchor linkToContact = new Anchor("#contact", "Contact");
-        linkToContact.setClassName("nav-link scrollto");
-
-        ListItem homeItem = new ListItem(linkToHome);
-        ListItem aboutItem = new ListItem(linkToAbout);
-        ListItem contactItem = new ListItem(linkToContact);
-
-        UnorderedList links = new UnorderedList(homeItem, aboutItem, contactItem);
+        UnorderedList links = new UnorderedList(getNavigationItem("#home", "Home"),
+                getNavigationItem("#about", "About"), getNavigationItem("#contact", "Contact"));
         links.setClassName("navbar-nav");
 
+        Anchor logo = new Anchor("/2", "CasualTalk");
+        logo.setClassName("navbar-brand logo");
+
+        Nav navigation = new Nav(logo, getHamburgerButton(), getNavigationLinks(accountLinks, links));
+        navigation.setClassName("navbar navbar-light navbar-expand-lg");
+
+        Header header = new Header(navigation);
+        header.setWidth(100, Unit.PERCENTAGE);
+        header.setClassName("fixed-top");
+        header.setId("header");
+
+        add(header);
+    }
+
+    private static Div getNavigationLinks(UnorderedList accountLinks, UnorderedList links) {
+        Div navigationLinks = new Div(links, accountLinks);
+        navigationLinks.setClassName("collapse navbar-collapse");
+        navigationLinks.setId("navbarSupportedContent");
+        return navigationLinks;
+    }
+
+    private static ListItem getNavigationItem(String href, String text) {
+        Anchor linkToHome = new Anchor(href, text);
+        linkToHome.setClassName("nav-link scrollto");
+        return new ListItem(linkToHome);
+    }
+
+    private static NativeButton getHamburgerButton() {
         Span hamburgerIcon = new Span();
         hamburgerIcon.setClassName("navbar-toggler-icon");
 
@@ -57,22 +75,6 @@ public class TopBar extends HorizontalLayout {
 
         NativeButton hamburgerButton = ComponentUtil.componentFromElement(hamburgerButtonElement, NativeButton.class, true);
         hamburgerButton.add(hamburgerIcon);
-
-        Anchor logo = new Anchor("/2", "CasualTalk");
-        logo.setClassName("navbar-brand logo");
-
-        Div navigationLinks = new Div(links, accountLinks);
-        navigationLinks.setClassName("collapse navbar-collapse");
-        navigationLinks.setId("navbarSupportedContent");
-
-        Nav navigation = new Nav(logo, hamburgerButton, navigationLinks);
-        navigation.setClassName("navbar navbar-light navbar-expand-lg");
-
-        Header header = new Header(navigation);
-        header.setWidth(100, Unit.PERCENTAGE);
-        header.setClassName("fixed-top");
-        header.setId("header");
-
-        add(header);
+        return hamburgerButton;
     }
 }

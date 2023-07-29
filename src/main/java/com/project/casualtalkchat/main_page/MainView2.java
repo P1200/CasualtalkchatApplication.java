@@ -1,9 +1,11 @@
 package com.project.casualtalkchat.main_page;
 
 import com.project.casualtalkchat.common.TopBar;
+import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.dependency.JavaScript;
 import com.vaadin.flow.component.dependency.StyleSheet;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Footer;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -20,9 +22,32 @@ public class MainView2 extends VerticalLayout {
         this.setPadding(false);
         TopBar topBar = new TopBar();
 
-        Footer footer = new Footer(new Paragraph("Copyrights"));
-        footer.setHeight(5, Unit.PERCENTAGE);
+        Footer footer = getFooterComponent();
 
         add(topBar, new HomeSection(), new AboutSection(),new ContactSection(), footer);
+    }
+
+    private static Footer getFooterComponent() {
+
+        Div copyright = getCopyrightPart();
+
+        Div credits = new Div(new Paragraph("Designed by Mateusz Wołek"));
+        credits.setClassName("credits");
+
+        Div copyrightAndCredits = new Div(copyright, credits);
+        copyrightAndCredits.setClassName("container footer-bottom clearfix");
+
+        Footer footer = new Footer(copyrightAndCredits);
+        footer.setWidth(100, Unit.PERCENTAGE);
+        footer.setId("footer");
+        return footer;
+    }
+
+    private static Div getCopyrightPart() {
+        Html copyrightText = new Html("<p>© Copyright <strong>University of Zielona Góra</strong>. " +
+                "All Rights Reserved</p>");
+        Div copyright = new Div(copyrightText);
+        copyright.setClassName("copyright");
+        return copyright;
     }
 }

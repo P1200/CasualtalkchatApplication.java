@@ -1,15 +1,12 @@
 package com.project.casualtalkchat.main_page;
 
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.HtmlComponent;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.server.StreamResource;
-
-import java.util.Objects;
 
 @CssImport("./styles.css")
 public class AboutSection extends Section {
@@ -40,31 +37,35 @@ public class AboutSection extends Section {
     }
 
     private Component getApplicationDescriptionPart() {
-
-        Paragraph firstAdvantage = new Paragraph("Easy in use and convenient");
-        firstAdvantage.setClassName("ml-2");
-        ListItem convince = new ListItem(getCheckMarkIcon(), firstAdvantage);
-        convince.setClassName("row");
-        Paragraph secondAdvantage = new Paragraph("Adapted to mobile devices");
-        secondAdvantage.setClassName("ml-2");
-        ListItem convince2 = new ListItem(getCheckMarkIcon(), secondAdvantage);
-        convince2.setClassName("row");
-        Paragraph thirdAdvantage = new Paragraph("Completely free, without any ads and payments");
-        thirdAdvantage.setClassName("ml-2");
-        ListItem convince3 = new ListItem(getCheckMarkIcon(), thirdAdvantage);
-        convince3.setClassName("row");
-
-        UnorderedList applicationAdvantages = new UnorderedList(convince, convince2, convince3);
-        applicationAdvantages.setClassName("advantages-list");
-
-        H3 slogan = new H3("Free web chat application for everyone");
-        Paragraph shortProductDescription = new Paragraph("CasualTalk is modern, convenient and free web application for every  to chatting with people around the world");
+        Paragraph shortProductDescription =
+                new Paragraph("CasualTalk is modern, convenient and free web application for every to chatting with people around the world.");
         shortProductDescription.setClassName("fst-italic");
 
-        Div incentivePart = new Div(slogan, shortProductDescription, applicationAdvantages);
+        Div incentivePart = new Div(new H3("Free web chat application for everyone"),
+                shortProductDescription, getApplicationAdvantagesList(), new Paragraph("Join us now and be in touch with friends and coworkers."));
         incentivePart.setClassName("col-lg-6 pt-4 pt-lg-0 content");
 
         return incentivePart;
+    }
+
+    private UnorderedList getApplicationAdvantagesList() {
+        ListItem firstAdvantage = createAndGetAdvantage("Easy in use and convenient");
+        ListItem secondAdvantage = createAndGetAdvantage("Adapted to mobile devices");
+        ListItem thirdAdvantage = createAndGetAdvantage("Completely free, without any ads and payments");
+        ListItem fourthAdvantage = createAndGetAdvantage("Advanced messaging options");
+
+        UnorderedList applicationAdvantages = new UnorderedList(firstAdvantage, secondAdvantage,
+                thirdAdvantage, fourthAdvantage);
+        applicationAdvantages.setClassName("advantages-list");
+        return applicationAdvantages;
+    }
+
+    private ListItem createAndGetAdvantage(String advantageText) {
+        Paragraph firstAdvantage = new Paragraph(advantageText);
+        firstAdvantage.setClassName("ml-2");
+        ListItem convince = new ListItem(getCheckMarkIcon(), firstAdvantage);
+        convince.setClassName("row");
+        return convince;
     }
 
     private Icon getCheckMarkIcon() {
