@@ -19,6 +19,26 @@ public class TopBar extends HorizontalLayout {
 
         this.setWidth(100, Unit.PERCENTAGE);
 
+        Header header = new Header(getNavigationPart());
+        header.setWidth(100, Unit.PERCENTAGE);
+        header.setClassName("fixed-top");
+        header.setId("header");
+
+        add(header);
+    }
+
+    private Nav getNavigationPart() {
+
+        Anchor logo = new Anchor("/2", "CasualTalk");
+        logo.setClassName("navbar-brand logo");
+
+        Nav navigation = new Nav(logo, getHamburgerButton(), getNavigationLinks(getAccountManagementLinks(),
+                getNavigationLinks()));
+        navigation.setClassName("navbar navbar-light navbar-expand-lg");
+        return navigation;
+    }
+
+    private static UnorderedList getAccountManagementLinks() {
         Anchor linkToLogin = new Anchor("#Login", "Login");
         linkToLogin.setClassName("nav-link login-button");
         Anchor linkToRegistration = new Anchor("#Registration", "Registration");
@@ -29,39 +49,30 @@ public class TopBar extends HorizontalLayout {
 
         UnorderedList accountLinks = new UnorderedList(loginItem, registrationItem);
         accountLinks.setClassName("navbar-nav ms-auto");
+        return accountLinks;
+    }
 
+    private UnorderedList getNavigationLinks() {
         UnorderedList links = new UnorderedList(getNavigationItem("#home", "Home"),
                 getNavigationItem("#about", "About"), getNavigationItem("#contact", "Contact"));
         links.setClassName("navbar-nav");
-
-        Anchor logo = new Anchor("/2", "CasualTalk");
-        logo.setClassName("navbar-brand logo");
-
-        Nav navigation = new Nav(logo, getHamburgerButton(), getNavigationLinks(accountLinks, links));
-        navigation.setClassName("navbar navbar-light navbar-expand-lg");
-
-        Header header = new Header(navigation);
-        header.setWidth(100, Unit.PERCENTAGE);
-        header.setClassName("fixed-top");
-        header.setId("header");
-
-        add(header);
+        return links;
     }
 
-    private static Div getNavigationLinks(UnorderedList accountLinks, UnorderedList links) {
+    private Div getNavigationLinks(UnorderedList accountLinks, UnorderedList links) {
         Div navigationLinks = new Div(links, accountLinks);
         navigationLinks.setClassName("collapse navbar-collapse");
         navigationLinks.setId("navbarSupportedContent");
         return navigationLinks;
     }
 
-    private static ListItem getNavigationItem(String href, String text) {
+    private ListItem getNavigationItem(String href, String text) {
         Anchor linkToHome = new Anchor(href, text);
         linkToHome.setClassName("nav-link scrollto");
         return new ListItem(linkToHome);
     }
 
-    private static NativeButton getHamburgerButton() {
+    private NativeButton getHamburgerButton() {
         Span hamburgerIcon = new Span();
         hamburgerIcon.setClassName("navbar-toggler-icon");
 
