@@ -27,8 +27,8 @@ public class HomeSection extends Section {
     }
 
     private Image getAnimatedImage() {
-        StreamResource imageResource = new StreamResource("pngwing.com (1).png",
-                () -> getClass().getResourceAsStream("/images/pngwing.com (1).png"));
+        StreamResource imageResource = new StreamResource("woaman_in_front_of_computer.png",
+                () -> getClass().getResourceAsStream("/images/woaman_in_front_of_computer.png"));
 
         Image animatedImage = new Image(imageResource, "Woman chatting with someone");
         animatedImage.setClassName("img-fluid animated");

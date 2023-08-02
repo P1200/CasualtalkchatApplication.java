@@ -44,3 +44,6 @@ vite.generated.ts
 # Maven wrapper
 .mvn/
 mvnw
+
+#User's files
+src/main/resources/images/users/
