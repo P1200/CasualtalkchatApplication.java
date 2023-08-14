@@ -8,11 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.Serializable;
 
 @Service
 @Transactional
-public class UserRegistrationService implements Serializable{
+public class UserRegistrationService {
 
     public static final String PATH_TO_AVATARS_DIRECTORY = "src/main/resources/images/users/avatars/";
     private final UserRepository userRepository;
@@ -34,7 +33,8 @@ public class UserRegistrationService implements Serializable{
 
         throwExceptionIfUserWithThatEmailExists(user.getEmail());
 
-        String avatarNameMd5 = DigestUtils.md5Hex(avatar.getName()); //TODO what if it generates same codes for different images?
+        String avatarNameMd5 = DigestUtils.md5Hex(avatar.getName()) + "." + avatar.getMime()
+                .split("/")[1]; //TODO what if it generates same codes for different images?
         saveAvatarOrThrowException(avatar, avatarNameMd5);
         user.setAvatarName(avatarNameMd5);
 

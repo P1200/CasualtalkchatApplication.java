@@ -1,6 +1,7 @@
 package com.project.casualtalkchat.account_confirmation_page;
 
 import com.project.casualtalkchat.common.OperationStatusView;
+import com.project.casualtalkchat.security.SecurityService;
 import com.vaadin.flow.component.dependency.JavaScript;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.icon.Icon;
@@ -36,9 +37,12 @@ public class AccountConfirmationView extends VerticalLayout implements HasUrlPar
 
     private final VerificationTokenRepository tokenRepository;
     private final UserRepository userRepository;
+    private final SecurityService securityService;
 
     public AccountConfirmationView(@Autowired VerificationTokenRepository tokenRepository,
-                                   @Autowired UserRepository userRepository) {
+                                   @Autowired UserRepository userRepository,
+                                   SecurityService securityService) {
+        this.securityService = securityService;
         this.tokenRepository = tokenRepository;
         this.userRepository = userRepository;
     }
@@ -62,12 +66,12 @@ public class AccountConfirmationView extends VerticalLayout implements HasUrlPar
 
             SUCCESS_STATUS_ICON.setColor(SUCCESS_STATUS_ICON_COLOR);
 
-            add(new OperationStatusView(SUCCESS_STATUS_ICON, SUCCESS_HEADER_TEXT, OPERATION_SUCCEEDED_TEXT, ACCOUNT_VERIFIED_TEXT));
+            add(new OperationStatusView(securityService, SUCCESS_STATUS_ICON, SUCCESS_HEADER_TEXT, OPERATION_SUCCEEDED_TEXT, ACCOUNT_VERIFIED_TEXT));
         } else {
 
             FAILURE_STATUS_ICON.setColor(FAILURE_STATUS_ICON_COLOR);
 
-            add(new OperationStatusView(FAILURE_STATUS_ICON, FAILURE_HEADER_TEXT, OPERATION_FAILED_TEXT, ACCOUNT_NOT_VERIFIED_TEXT));
+            add(new OperationStatusView(securityService, FAILURE_STATUS_ICON, FAILURE_HEADER_TEXT, OPERATION_FAILED_TEXT, ACCOUNT_NOT_VERIFIED_TEXT));
         }
 
     }

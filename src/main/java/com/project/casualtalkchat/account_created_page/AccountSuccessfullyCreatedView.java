@@ -1,6 +1,7 @@
 package com.project.casualtalkchat.account_created_page;
 
 import com.project.casualtalkchat.common.OperationStatusView;
+import com.project.casualtalkchat.security.SecurityService;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -18,13 +19,13 @@ public class AccountSuccessfullyCreatedView extends VerticalLayout {
     private static final Icon STATUS_ICON = new Icon(VaadinIcon.CHECK_CIRCLE);
     private static final String STATUS_ICON_COLOR = "green";
 
-    public AccountSuccessfullyCreatedView() {
+    public AccountSuccessfullyCreatedView(SecurityService securityService) {
         this.getStyle()
                 .setBackground("#f3f4f6");
         this.setPadding(false);
 
         STATUS_ICON.setColor(STATUS_ICON_COLOR);
 
-        add(new OperationStatusView(STATUS_ICON, SUCCESS_HEADER_TEXT, CHECK_YOUR_INBOX_TEXT, VERIFY_YOUR_ACCOUNT_TEXT));
+        add(new OperationStatusView(securityService, STATUS_ICON, SUCCESS_HEADER_TEXT, CHECK_YOUR_INBOX_TEXT, VERIFY_YOUR_ACCOUNT_TEXT));
     }
 }
