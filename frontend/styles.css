@@ -16,7 +16,10 @@ h2 {
   font-style: italic;
 }
 
-.navbar-nav a:hover, .navbar-nav .active, .navbar-nav .active:focus, .navbar-nav li:hover>a {
+.navbar-nav a:hover,
+.navbar-nav .active,
+.navbar-nav .active:focus,
+.navbar-nav li:hover>a {
   color: #16df7e!important;
 }
 
@@ -33,7 +36,8 @@ h2 {
   color: #5f687b!important;
 }
 
-.navbar-nav .login-button, .navbar-nav .register-button {
+.navbar-nav .login-button,
+.navbar-nav .register-button {
   padding: 10px 15px;
   margin-left: 10px;
   border-radius: 4px;
@@ -44,12 +48,16 @@ h2 {
   border: 1px solid #cdd1d9;
 }
 
-.navbar-nav .login-button:hover, .navbar-nav .register-button:hover, .email-form button:hover {
+.navbar-nav .login-button:hover,
+.navbar-nav .register-button:hover,
+.email-form button:hover {
   background-color: #007aff!important;
   color: #fff!important;
 }
 
-#home .register-button, #home .login-button, #registration-form .register-button {
+#home .register-button, #home .login-button,
+#registration-form .register-button,
+vaadin-login-form vaadin-button[theme~="submit"] {
   font-weight: 500;
   font-size: 16px;
   letter-spacing: 1px;
@@ -63,7 +71,10 @@ h2 {
   box-shadow: 0 8px 28px rgba(22, 223, 126, 0.45);
 }
 
-#home .register-button:hover, #home .login-button:hover, #registration-form .register-button:hover {
+#home .register-button:hover,
+#home .login-button:hover,
+#registration-form .register-button:hover,
+vaadin-login-form vaadin-button[theme~="submit"]:hover {
   background-color: #007aff!important;
   color: #fff!important;
   text-decoration: none;
@@ -121,7 +132,8 @@ h2 {
   padding-bottom: 8px;
 }
 
-#contact .email-form input, .contact .email-form textarea {
+#contact .email-form input,
+.contact .email-form textarea {
   border-radius: 4px;
   box-shadow: none;
   font-size: 14px;
@@ -197,4 +209,10 @@ h2 {
 #footer .credits {
   float: right;
   font-size: 13px;
+}
+
+vaadin-login-form-wrapper::part(form-title) {
+  color: #858ea1;
+  font-size: 24px;
+  margin: 0 auto 30px;
 }

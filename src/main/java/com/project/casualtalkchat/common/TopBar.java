@@ -1,13 +1,22 @@
 package com.project.casualtalkchat.common;
 
+import com.project.casualtalkchat.security.CustomUserDetails;
+import com.project.casualtalkchat.security.SecurityService;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.Unit;
+import com.vaadin.flow.component.contextmenu.MenuItem;
+import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.dependency.JavaScript;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.menubar.MenuBar;
+import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.dom.ElementFactory;
+import com.vaadin.flow.server.StreamResource;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @JavaScript("https://code.jquery.com/jquery-3.5.1.slim.min.js")
 @JavaScript("https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js")
@@ -15,7 +24,11 @@ import com.vaadin.flow.dom.ElementFactory;
 @JavaScript("https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js")
 public class TopBar extends HorizontalLayout {
 
-    public TopBar() {
+    private final SecurityService securityService;
+
+    public TopBar(SecurityService securityService) {
+
+        this.securityService = securityService;
 
         this.setWidth(100, Unit.PERCENTAGE);
 
@@ -23,25 +36,64 @@ public class TopBar extends HorizontalLayout {
         header.setWidth(100, Unit.PERCENTAGE);
         header.setClassName("fixed-top");
         header.setId("header");
+        header.getStyle()
+                .setZIndex(10);
 
         add(header);
     }
 
     private Nav getNavigationPart() {
 
-        Anchor logo = new Anchor("/2", "CasualTalk");
+        Anchor logo = new Anchor("/", "CasualTalk");
         logo.setClassName("navbar-brand logo");
 
-        Nav navigation = new Nav(logo, getHamburgerButton(), getNavigationLinks(getAccountManagementLinks(),
-                getNavigationLinks()));
+        Nav navigation = new Nav(logo, getHamburgerButton(), getNavigationComponents(getAccountManagementLinks(),
+                getNavigationComponents()));
         navigation.setClassName("navbar navbar-light navbar-expand-lg");
         return navigation;
     }
 
-    private static UnorderedList getAccountManagementLinks() {
-        Anchor linkToLogin = new Anchor("#Login", "Login");
+    private Component getAccountManagementLinks() {
+
+        Object principal = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        if (principal instanceof CustomUserDetails userDetails) {
+
+            Div accountManagement = getAccountComponent(userDetails);
+            accountManagement.getStyle()
+                    .setCursor("pointer");
+
+            return getAccountManagementMenu(accountManagement);
+
+        } else {
+
+            return getLoginRegisterButtonsList();
+        }
+    }
+
+    private Div getAccountComponent(CustomUserDetails userDetails) {
+        Image avatar = new Image(getAvatarResource(userDetails), "Avatar image");
+        avatar.getStyle()
+                .setWidth("40px")
+                .set("margin-right", "0.5rem");
+        Paragraph username = new Paragraph(userDetails.getUsername());
+        username.getStyle()
+                .set("margin-top", "auto")
+                .set("margin-bottom", "auto");
+
+        Div accountManagement = new Div(avatar, username);
+        accountManagement.setClassName("row");
+        accountManagement.getStyle()
+                .set("margin-right", "0");
+        return accountManagement;
+    }
+
+    private UnorderedList getLoginRegisterButtonsList() {
+        Anchor linkToLogin = new Anchor("login", "Login");
         linkToLogin.setClassName("nav-link login-button");
-        Anchor linkToRegistration = new Anchor("#Registration", "Registration");
+        Anchor linkToRegistration = new Anchor("register", "Registration");
         linkToRegistration.setClassName("nav-link register-button");
 
         ListItem loginItem = new ListItem(linkToLogin);
@@ -52,14 +104,49 @@ public class TopBar extends HorizontalLayout {
         return accountLinks;
     }
 
-    private UnorderedList getNavigationLinks() {
-        UnorderedList links = new UnorderedList(getNavigationItem("#home", "Home"),
+    private MenuBar getAccountManagementMenu(Div accountManagement) {
+        MenuBar menuBar = new MenuBar();
+        menuBar.addThemeVariants(MenuBarVariant.LUMO_TERTIARY_INLINE);
+
+        MenuItem menuItem = menuBar.addItem(accountManagement);
+        menuItem.getStyle()
+                .set("padding-left", "15px");
+        SubMenu subMenu = menuItem.getSubMenu();
+
+        subMenu.addItem("Settings");
+        subMenu.addItem("Help");
+        subMenu.addItem("Sing out", event -> securityService.logout());
+        subMenu.getChildren()
+                .forEach(item -> item.getStyle()
+                        .setCursor("pointer"));
+        menuBar.setClassName("navbar-nav ms-auto");
+        return menuBar;
+    }
+
+    private StreamResource getAvatarResource(CustomUserDetails userDetails) {
+        StreamResource imageResource;
+        if (userDetails.getAvatar() == null) {
+
+            imageResource = new StreamResource("default_avatar_image.png",
+                    () -> getClass().getResourceAsStream("/images/default_avatar_image.png"));
+
+        } else {
+
+            imageResource = new StreamResource(userDetails.getAvatar(),
+                    () -> getClass().getResourceAsStream("/images/users/avatars/" +
+                            userDetails.getAvatar()));
+        }
+        return imageResource;
+    }
+
+    private UnorderedList getNavigationComponents() {
+        UnorderedList links = new UnorderedList(getNavigationItem("/", "Home"),
                 getNavigationItem("#about", "About"), getNavigationItem("#contact", "Contact"));
         links.setClassName("navbar-nav");
         return links;
     }
 
-    private Div getNavigationLinks(UnorderedList accountLinks, UnorderedList links) {
+    private Div getNavigationComponents(Component accountLinks, UnorderedList links) {
         Div navigationLinks = new Div(links, accountLinks);
         navigationLinks.setClassName("collapse navbar-collapse");
         navigationLinks.setId("navbarSupportedContent");
@@ -84,7 +171,8 @@ public class TopBar extends HorizontalLayout {
         hamburgerButtonElement.setAttribute("aria-expanded", "false");
         hamburgerButtonElement.setAttribute("aria-label", "Toggle navigation");
 
-        NativeButton hamburgerButton = ComponentUtil.componentFromElement(hamburgerButtonElement, NativeButton.class, true);
+        NativeButton hamburgerButton =
+                ComponentUtil.componentFromElement(hamburgerButtonElement, NativeButton.class, true);
         hamburgerButton.add(hamburgerIcon);
         return hamburgerButton;
     }

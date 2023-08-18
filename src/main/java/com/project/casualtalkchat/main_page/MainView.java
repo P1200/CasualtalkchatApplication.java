@@ -2,6 +2,7 @@ package com.project.casualtalkchat.main_page;
 
 import com.project.casualtalkchat.common.BottomBar;
 import com.project.casualtalkchat.common.TopBar;
+import com.project.casualtalkchat.security.SecurityService;
 import com.vaadin.flow.component.dependency.JavaScript;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -16,9 +17,9 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 @JavaScript("https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js")
 public class MainView extends VerticalLayout {
 
-    MainView() {
+    MainView(SecurityService securityService) {
         this.setPadding(false);
 
-        add(new TopBar(), new HomeSection(), new AboutSection(),new ContactSection(), new BottomBar());
+        add(new TopBar(securityService), new HomeSection(), new AboutSection(), new ContactSection(), new BottomBar());
     }
 }

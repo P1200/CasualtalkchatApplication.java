@@ -1,10 +1,12 @@
-package com.project.casualtalkchat.register_page;
+package com.project.casualtalkchat.login_page;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository("register-page-user-repository")
+import java.util.Optional;
+
+@Repository("login-page-user-repository")
 public interface UserRepository extends JpaRepository<UserEntity, String> {
 
-    UserEntity findByEmail(String email);
+    Optional<UserEntity> findByEmail(String userEmail);
 }

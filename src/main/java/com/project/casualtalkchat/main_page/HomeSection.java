@@ -45,9 +45,9 @@ public class HomeSection extends Section {
     }
 
     private Div getNavigationButtons() {
-        Anchor registrationButton = new Anchor("", "Register now!");
+        Anchor registrationButton = new Anchor("register", "Register now!");
         registrationButton.setClassName("register-button");
-        Anchor loginButton = new Anchor("", "Login now!");
+        Anchor loginButton = new Anchor("login", "Login now!");
         loginButton.setClassName("login-button");
 
         Div buttons = new Div(registrationButton, loginButton);

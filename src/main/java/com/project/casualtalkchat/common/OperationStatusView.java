@@ -1,5 +1,6 @@
 package com.project.casualtalkchat.common;
 
+import com.project.casualtalkchat.security.SecurityService;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.dependency.JavaScript;
 import com.vaadin.flow.component.dependency.StyleSheet;
@@ -16,7 +17,7 @@ import com.vaadin.flow.dom.Style;
 @JavaScript("https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js")
 public class OperationStatusView extends Div {
 
-    public OperationStatusView(Icon statusIcon, String headerText, String secondHeaderText, String paragraphText) {
+    public OperationStatusView(SecurityService securityService, Icon statusIcon, String headerText, String secondHeaderText, String paragraphText) {
         this.getStyle()
                 .setBackground("#f3f4f6");
         this.setWidth(100, Unit.PERCENTAGE);
@@ -30,7 +31,7 @@ public class OperationStatusView extends Div {
         BottomBar bottomBar = new BottomBar();
         bottomBar.setWidth(100, Unit.PERCENTAGE);
 
-        add(new TopBar(), card, bottomBar);
+        add(new TopBar(securityService), card, bottomBar);
     }
 
     private Div getCard(Icon statusIcon, H1 header, H2 checkYourInboxHeader, Paragraph checkYourInboxText) {
