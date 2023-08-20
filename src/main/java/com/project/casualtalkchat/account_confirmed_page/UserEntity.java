@@ -1,4 +1,4 @@
-package com.project.casualtalkchat.account_confirmation_page;
+package com.project.casualtalkchat.account_confirmed_page;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;

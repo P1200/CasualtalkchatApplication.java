@@ -1,5 +1,6 @@
 package com.project.casualtalkchat.login_page;
 
+import com.project.casualtalkchat.account_recovery_page.AccountRecoveryView;
 import com.project.casualtalkchat.common.BottomBar;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.dependency.JavaScript;
@@ -38,6 +39,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         logo.setWidth(100, Unit.PERCENTAGE);
 
         loginForm.setI18n(getLoginI18n());
+        loginForm.addForgotPasswordListener(event -> getUI().ifPresent(ui -> ui.navigate(AccountRecoveryView.class)));
         loginForm.setAction("login");
         loginForm.setClassName("card");
 

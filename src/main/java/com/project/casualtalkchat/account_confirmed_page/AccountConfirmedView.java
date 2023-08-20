@@ -1,4 +1,4 @@
-package com.project.casualtalkchat.account_confirmation_page;
+package com.project.casualtalkchat.account_confirmed_page;
 
 import com.project.casualtalkchat.common.OperationStatusView;
 import com.project.casualtalkchat.security.SecurityService;
@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @JavaScript("https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js")
 @StyleSheet("https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css")
 @JavaScript("https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js")
-public class AccountConfirmationView extends VerticalLayout implements HasUrlParameter<String> {
+public class AccountConfirmedView extends VerticalLayout implements HasUrlParameter<String> {
 
     private static final String SUCCESS_HEADER_TEXT = "Your account has been successfully confirmed";
     private static final String FAILURE_HEADER_TEXT = "Your account has not been successfully confirmed";
@@ -39,9 +39,9 @@ public class AccountConfirmationView extends VerticalLayout implements HasUrlPar
     private final UserRepository userRepository;
     private final SecurityService securityService;
 
-    public AccountConfirmationView(@Autowired VerificationTokenRepository tokenRepository,
-                                   @Autowired UserRepository userRepository,
-                                   SecurityService securityService) {
+    public AccountConfirmedView(@Autowired VerificationTokenRepository tokenRepository,
+                                @Autowired UserRepository userRepository,
+                                SecurityService securityService) {
         this.securityService = securityService;
         this.tokenRepository = tokenRepository;
         this.userRepository = userRepository;
@@ -51,6 +51,7 @@ public class AccountConfirmationView extends VerticalLayout implements HasUrlPar
     public void setParameter(BeforeEvent beforeEvent, @WildcardParameter String userIdAndToken) {
 
         VerificationTokenEntity tokenEntity = getVerificationTokenEntity(userIdAndToken);
+        //TODO verification token should be deleted after use
 
         this.getStyle()
                 .setBackground("#f3f4f6");
