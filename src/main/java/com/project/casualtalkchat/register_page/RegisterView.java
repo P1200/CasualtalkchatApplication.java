@@ -2,6 +2,7 @@ package com.project.casualtalkchat.register_page;
 
 import com.project.casualtalkchat.account_created_page.AccountSuccessfullyCreatedView;
 import com.project.casualtalkchat.common.BottomBar;
+import com.project.casualtalkchat.common.PasswordValidator;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.CheckboxGroup;
@@ -50,7 +51,6 @@ public class RegisterView extends VerticalLayout {
     private PasswordField repeatedPasswordField;
 
     private BeanValidationBinder<UserEntity> binder;
-    private boolean enablePasswordValidation;
 
     public RegisterView(@Autowired UserRegistrationService service, @Autowired ApplicationEventPublisher eventPublisher) {
 
@@ -147,13 +147,15 @@ public class RegisterView extends VerticalLayout {
                 .asRequired(new EmailValidator("Value is not a valid email address"))
                 .bind("email");
 
+        var passwordValidator = new PasswordValidator();
+
         binder.forField(passwordField)
-                .withValidator(this::passwordValidator)
+                .withValidator(passwordValidator::validatePassword)
                 .bind("password");
 
         binder.forField(repeatedPasswordField)
                 .asRequired("Please repeat the password")
-                .withValidator(this::repeatedPasswordValidator)
+                .withValidator(passwordValidator::validateRepeatedPassword)
                 .bind(userEntity -> "",
                         //Just a trick to avoid data binding
                         (user, repeatedPassword) -> user.skipDataBinding());
@@ -168,37 +170,6 @@ public class RegisterView extends VerticalLayout {
         }
 
         return ValidationResult.error(SERVICE_TERMS_NOT_ACCEPTED_ERROR_MESSAGE);
-    }
-
-    private ValidationResult passwordValidator(String password, ValueContext ctx) {
-
-        if (password == null || password.length() < 8) {
-            return ValidationResult.error("Password should be at least 8 characters long");
-        } else if (!password.matches(".*\\d.*")) {
-            return ValidationResult.error("Password should contains at least one digit");
-        } else if (!password.matches(".*[A-Z].*")) {
-            return ValidationResult.error("Password should contains at least one uppercase letter");
-        } else if (!password.matches(".*[a-z].*")) {
-            return ValidationResult.error("Password should be at least one lowercase letter");
-        } else if (!password.matches(".*[#?!@$%^&*-].*")) {
-            return ValidationResult.error("Password should contains at least one special character");
-        }
-
-        if (!enablePasswordValidation) {
-            enablePasswordValidation = true;
-        }
-        return ValidationResult.ok();
-    }
-
-    private ValidationResult repeatedPasswordValidator(String repeatedPassword, ValueContext ctx) {
-
-        String password = passwordField.getValue();
-
-        if (repeatedPassword != null && repeatedPassword.equals(password)) {
-            return ValidationResult.ok();
-        }
-
-        return ValidationResult.error("Passwords do not match");
     }
 
     private void validateAndBindDataOrShowErrorMessage() {

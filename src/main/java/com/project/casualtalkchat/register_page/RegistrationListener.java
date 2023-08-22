@@ -26,13 +26,13 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
     @Override
     public void onApplicationEvent(@NonNull OnRegistrationCompleteEvent event) {
         try {
-            this.confirmRegistration(event);
+            this.sendConfirmRegistrationEmail(event);
         } catch (MessagingException e) {
             throw new RuntimeException(e); //TODO
         }
     }
 
-    private void confirmRegistration(OnRegistrationCompleteEvent event) throws MessagingException {
+    private void sendConfirmRegistrationEmail(OnRegistrationCompleteEvent event) throws MessagingException {
         UserEntity user = event.getUser();
         String token = UUID.randomUUID()
                             .toString();

@@ -1,4 +1,4 @@
-package com.project.casualtalkchat.account_confirmation_page;
+package com.project.casualtalkchat.account_recovery_page;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -7,14 +7,14 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Calendar;
 
-@Entity(name = "account-confirmation-page-verification-token")
-@Table(name = "verification_token")
+@Entity(name = "account-recovery-page-verification-token")
+@Table(name = "recovery_token")
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-class VerificationTokenEntity {
+class AccountRecoveryTokenEntity {
     private static final int EXPIRATION = 60 * 24;
 
     @Id
