@@ -216,3 +216,7 @@ vaadin-login-form-wrapper::part(form-title) {
   font-size: 24px;
   margin: 0 auto 30px;
 }
+
+vaadin-message::part(message) {
+  overflow-wrap: anywhere;
+}
