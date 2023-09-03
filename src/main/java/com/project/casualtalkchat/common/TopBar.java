@@ -15,8 +15,9 @@ import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.dom.ElementFactory;
-import com.vaadin.flow.server.StreamResource;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import static com.project.casualtalkchat.common.UserEntityUtils.getAvatarResource;
 
 @JavaScript("https://code.jquery.com/jquery-3.5.1.slim.min.js")
 @JavaScript("https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js")
@@ -121,22 +122,6 @@ public class TopBar extends HorizontalLayout {
                         .setCursor("pointer"));
         menuBar.setClassName("navbar-nav ms-auto");
         return menuBar;
-    }
-
-    private StreamResource getAvatarResource(CustomUserDetails userDetails) {
-        StreamResource imageResource;
-        if (userDetails.getAvatar() == null) {
-
-            imageResource = new StreamResource("default_avatar_image.png",
-                    () -> getClass().getResourceAsStream("/images/default_avatar_image.png"));
-
-        } else {
-
-            imageResource = new StreamResource(userDetails.getAvatar(),
-                    () -> getClass().getResourceAsStream("/images/users/avatars/" +
-                            userDetails.getAvatar()));
-        }
-        return imageResource;
     }
 
     private UnorderedList getNavigationComponents() {
