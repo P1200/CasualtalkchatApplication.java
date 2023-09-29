@@ -21,7 +21,6 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.VaadinServlet;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.io.FileNotFoundException;
@@ -52,7 +51,7 @@ public class RegisterView extends VerticalLayout {
 
     private BeanValidationBinder<UserEntity> binder;
 
-    public RegisterView(@Autowired UserRegistrationService service, @Autowired ApplicationEventPublisher eventPublisher) {
+    public RegisterView(UserRegistrationService service, ApplicationEventPublisher eventPublisher) {
 
         this.service = service;
         this.eventPublisher = eventPublisher;

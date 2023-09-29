@@ -52,6 +52,12 @@ public class UserService {
         return userRepository.findAllFriends(userId);
     }
 
+    @Transactional
+    public void removeFriend(String userId, UserEntity friendEntity) {
+
+        userRepository.removeFriend(userId, friendEntity.getId());
+    }
+
     private void addUserAsFriend(UserEntity user, UserEntity friend) {
         user.getFriends()
                 .add(friend);
