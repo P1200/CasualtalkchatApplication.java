@@ -17,18 +17,18 @@ public class UserEntityUtils {
         return getAvatarResource(userDetails.getAvatar());
     }
 
-    private static StreamResource getAvatarResource(String userDetails) {
+    private static StreamResource getAvatarResource(String avatarName) {
         StreamResource imageResource;
-        if (userDetails == null) {
+        if (avatarName == null) {
 
             imageResource = new StreamResource("default_avatar_image.png",
                     () -> UserEntityUtils.class.getResourceAsStream("/images/default_avatar_image.png"));
 
         } else {
 
-            imageResource = new StreamResource(userDetails,
+            imageResource = new StreamResource(avatarName,
                     () -> UserEntityUtils.class.getResourceAsStream("/images/users/avatars/" +
-                            userDetails));
+                            avatarName));
         }
         return imageResource;
     }
