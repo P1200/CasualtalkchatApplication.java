@@ -1,9 +1,11 @@
 package com.project.casualtalkchat.main_page;
 
+import com.project.casualtalkchat.security.CustomUserDetails;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.server.StreamResource;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @CssImport("./styles.css")
 public class HomeSection extends Section {
@@ -45,6 +47,30 @@ public class HomeSection extends Section {
     }
 
     private Div getNavigationButtons() {
+
+        Object principal = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        if (principal instanceof CustomUserDetails) {
+
+            return getRedirectionToChatButton();
+        } else {
+
+            return getLoginRegisterButtons();
+        }
+    }
+
+    private Div getRedirectionToChatButton() {
+        Anchor goToChatButton = new Anchor("chat", "Start using our chat!");
+        goToChatButton.setClassName("register-button");
+
+        Div button = new Div(goToChatButton);
+        button.setClassName("d-flex");
+        return button;
+    }
+
+    private Div getLoginRegisterButtons() {
         Anchor registrationButton = new Anchor("register", "Register now!");
         registrationButton.setClassName("register-button");
         Anchor loginButton = new Anchor("login", "Login now!");
