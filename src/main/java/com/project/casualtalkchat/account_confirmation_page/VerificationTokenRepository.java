@@ -1,4 +1,4 @@
-package com.project.casualtalkchat.account_confirmed_page;
+package com.project.casualtalkchat.account_confirmation_page;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
