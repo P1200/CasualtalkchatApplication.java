@@ -4,11 +4,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 @Service
 @Transactional
 public class UserAccountRecoveryService {
 
+    private final Supplier<UUID> randomUUID = UUID::randomUUID;
     private final UserRepository userRepository;
     private final AccountRecoveryTokenRepository tokenRepository;
 
@@ -17,23 +19,23 @@ public class UserAccountRecoveryService {
         this.tokenRepository = tokenRepository;
     }
 
-    public String createRecoveryTokenForUser(UserEntity user) {
+    public String getRecoveryTokenForUser(UserEntity user) {
 
-        AccountRecoveryTokenEntity tokenEntity = tokenRepository.findByUserId(user.getId());
+        AccountRecoveryTokenEntity oldRecoveryTokenEntity = tokenRepository.findByUserId(user.getId());
 
-        if (tokenEntity == null) {
-            String token = UUID.randomUUID()
-                                .toString();
+        if (oldRecoveryTokenEntity == null) {
+            String token = randomUUID.get()
+                                    .toString();
 
-            AccountRecoveryTokenEntity verificationToken = AccountRecoveryTokenEntity.builder()
+            AccountRecoveryTokenEntity newRecoveryTokenEntity = AccountRecoveryTokenEntity.builder()
                                                                                     .token(token)
                                                                                     .user(user)
                                                                                     .build();
 
-            tokenRepository.save(verificationToken);
+            tokenRepository.save(newRecoveryTokenEntity);
             return token;
         } else {
-            return tokenEntity.getToken();
+            return oldRecoveryTokenEntity.getToken();
         }
     }
 
