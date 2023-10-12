@@ -7,8 +7,8 @@ public class ConversationFilter {
         this.searchTerm = searchTerm;
     }
 
-    public boolean test(ConversationEntity person) {
-        return matches(person.getName(), searchTerm);
+    public boolean test(ConversationEntity conversation) {
+        return matches(conversation.getName(), searchTerm);
     }
 
     private boolean matches(String value, String searchTerm) {

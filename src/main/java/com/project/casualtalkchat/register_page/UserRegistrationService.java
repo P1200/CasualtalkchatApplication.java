@@ -1,10 +1,13 @@
 package com.project.casualtalkchat.register_page;
 
+import com.project.casualtalkchat.common.UserEntityUtils;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -13,7 +16,7 @@ import java.io.IOException;
 @Transactional
 public class UserRegistrationService {
 
-    public static final String PATH_TO_AVATARS_DIRECTORY = "src/main/resources/images/users/avatars/";
+    public static final String PATH_TO_AVATARS_DIRECTORY = "src/main/resources" + UserEntityUtils.USER_AVATARS_PATH;
     private final UserRepository userRepository;
     private final VerificationTokenRepository tokenRepository;
 
@@ -52,7 +55,7 @@ public class UserRegistrationService {
 
     private void saveAvatarOrThrowException(AvatarImage avatar, String avatarNameMd5) throws FileNotFoundException {
         try (FileOutputStream outputStream =
-                     new FileOutputStream(PATH_TO_AVATARS_DIRECTORY + avatarNameMd5)) {
+                     FileUtils.openOutputStream(new File(PATH_TO_AVATARS_DIRECTORY + avatarNameMd5))) {
 
             outputStream.write(avatar.getImage());
         } catch (IOException e) {

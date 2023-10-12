@@ -1,14 +1,13 @@
 package com.project.casualtalkchat.chat_page;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.sql.Timestamp;
 
 @Getter
+@Setter
+@EqualsAndHashCode
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,6 +25,9 @@ public class MessageEntity {
     private MessageType type;
 
     private Timestamp sentTime;
+
+    @ManyToOne
+    private ConversationEntity conversation;
 
     @ManyToOne
     private UserEntity sender;

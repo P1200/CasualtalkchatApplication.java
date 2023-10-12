@@ -18,6 +18,13 @@ public class InvitationsDataProvider extends AbstractBackEndDataProvider<UserEnt
     }
 
     @Override
+    public void refreshAll() {
+
+        userEntities = service.getInvitationsToUser(userId);
+        super.refreshAll();
+    }
+
+    @Override
     protected Stream<UserEntity> fetchFromBackEnd(Query<UserEntity, UserFilter> query) {
         Stream<UserEntity> stream = userEntities.stream();
 
@@ -31,12 +38,5 @@ public class InvitationsDataProvider extends AbstractBackEndDataProvider<UserEnt
     @Override
     protected int sizeInBackEnd(Query<UserEntity, UserFilter> query) {
         return (int) fetchFromBackEnd(query).count();
-    }
-
-    @Override
-    public void refreshAll() {
-
-        userEntities = service.getInvitationsToUser(userId);
-        super.refreshAll();
     }
 }

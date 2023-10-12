@@ -16,7 +16,7 @@ public class AccountSuccessfullyCreatedView extends VerticalLayout {
     private static final String CHECK_YOUR_INBOX_TEXT = "Check your inbox now";
     private static final String VERIFY_YOUR_ACCOUNT_TEXT = "We've sent you a verification link to your email address. " +
             "Please check your email inbox and verify your account.";
-    private static final Icon STATUS_ICON = new Icon(VaadinIcon.CHECK_CIRCLE);
+    private static final Icon STATUS_ICON = VaadinIcon.CHECK_CIRCLE.create();
     private static final String STATUS_ICON_COLOR = "green";
 
     public AccountSuccessfullyCreatedView(SecurityService securityService) {

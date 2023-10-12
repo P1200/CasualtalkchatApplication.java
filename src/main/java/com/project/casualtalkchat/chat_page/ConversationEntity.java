@@ -1,14 +1,13 @@
 package com.project.casualtalkchat.chat_page;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Set;
 
 @Getter
+@Setter
+@ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,11 +22,9 @@ public class ConversationEntity {
     private String name;
 
     @ManyToMany
+    @ToString.Exclude
     private Set<UserEntity> admins;
 
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<UserEntity> members;
-
-    @OneToMany
-    private Set<MessageEntity> messages;
 }

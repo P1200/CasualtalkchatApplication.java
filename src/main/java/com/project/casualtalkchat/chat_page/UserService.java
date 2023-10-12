@@ -17,17 +17,17 @@ public class UserService {
     }
 
     @Transactional
-    public void addUserAsInvited(String id, UserEntity currentUser) {
-        UserEntity inviter = userRepository.getReferenceById(id);
-
+    public void addUserAsInvited(String senderId, UserEntity receiverUserEntity) {
+        UserEntity inviter = userRepository.getReferenceById(senderId);
         inviter.getInvitations()
-                .add(currentUser);
+                .add(receiverUserEntity);
+
         userRepository.save(inviter);
     }
 
     @Transactional
-    public void acceptInvitation(String id, UserEntity inviter) {
-        UserEntity user = userRepository.getReferenceById(id);
+    public void acceptInvitation(String receiverId, UserEntity inviter) {
+        UserEntity user = userRepository.getReferenceById(receiverId);
 
         addUserAsFriend(user, inviter);
         removeInvitation(user, inviter);
@@ -59,8 +59,9 @@ public class UserService {
     }
 
     private void addUserAsFriend(UserEntity user, UserEntity friend) {
+
         user.getFriends()
-                .add(friend);
+            .add(friend);
         userRepository.save(user);
     }
 
