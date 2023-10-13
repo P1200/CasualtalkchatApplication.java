@@ -4,7 +4,9 @@ import com.project.casualtalkchat.security.CustomUserDetails;
 import com.vaadin.flow.server.StreamResource;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserEntityUtils {
 
@@ -19,16 +21,26 @@ public class UserEntityUtils {
     public static StreamResource getAvatarResource(String avatarName) {
         StreamResource imageResource;
         if (avatarName == null) {
-
-            imageResource = new StreamResource(DEFAULT_AVATAR_NAME,
-                    () -> UserEntityUtils.class.getResourceAsStream(DEFAULT_AVATAR_PATH + DEFAULT_AVATAR_NAME));
-
+            imageResource = getDefaultAvatarResource();
         } else {
-
-            imageResource = new StreamResource(avatarName,
-                    () -> UserEntityUtils.class.getResourceAsStream(USER_AVATARS_PATH +
-                            avatarName));
+            if (UserEntityUtils.class.getResource(USER_AVATARS_PATH + avatarName) != null) {
+                imageResource = new StreamResource(avatarName,
+                        () -> UserEntityUtils.class.getResourceAsStream(USER_AVATARS_PATH + avatarName));
+            } else {
+                log.error("User avatar resource not found.");
+                imageResource = getDefaultAvatarResource();
+            }
         }
         return imageResource;
+    }
+
+    private static StreamResource getDefaultAvatarResource() {
+        if (UserEntityUtils.class.getResource(DEFAULT_AVATAR_PATH + DEFAULT_AVATAR_NAME) != null) {
+            return new StreamResource(DEFAULT_AVATAR_NAME,
+                    () -> UserEntityUtils.class.getResourceAsStream(DEFAULT_AVATAR_PATH + DEFAULT_AVATAR_NAME));
+        } else {
+            log.error("Default avatar resource doesn't exist.");
+            return null;
+        }
     }
 }

@@ -5,7 +5,6 @@ import com.vaadin.flow.data.binder.ValueContext;
 
 public class PasswordValidator {
 
-    private boolean enablePasswordValidation;
     private String mainPasswordFieldValue;
 
     public ValidationResult validatePassword(String password, ValueContext ctx) {
@@ -24,9 +23,6 @@ public class PasswordValidator {
             return ValidationResult.error("Password should contains at least one special character");
         }
 
-        if (!enablePasswordValidation) {
-            enablePasswordValidation = true;
-        }
         return ValidationResult.ok();
     }
 
