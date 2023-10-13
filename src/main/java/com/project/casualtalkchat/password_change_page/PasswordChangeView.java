@@ -41,9 +41,8 @@ public class PasswordChangeView extends VerticalLayout implements HasUrlParamete
     private static final Icon FAILURE_STATUS_ICON = new Icon("lumo", "cross");
     private static final String FAILURE_STATUS_ICON_COLOR = "red";
 
-    private final AccountRecoveryTokenRepository tokenRepository;
-    private final UserRepository userRepository;
     private final SecurityService securityService;
+    private final ChangePasswordService service;
 
     private Span errorMessage;
     private Button submitButton;
@@ -52,23 +51,21 @@ public class PasswordChangeView extends VerticalLayout implements HasUrlParamete
 
     private BeanValidationBinder<UserEntity> binder;
 
-    public PasswordChangeView(AccountRecoveryTokenRepository tokenRepository, UserRepository userRepository,
+    public PasswordChangeView(ChangePasswordService service,
                               SecurityService securityService) {
         this.securityService = securityService;
-        this.tokenRepository = tokenRepository;
-        this.userRepository = userRepository;
+        this.service = service;
     }
 
     @Override
     public void setParameter(BeforeEvent beforeEvent, @WildcardParameter String userIdAndToken) {
-
-        AccountRecoveryTokenEntity tokenEntity = getTokenEntity(userIdAndToken);
 
         this.getStyle()
                 .setBackground("#f3f4f6");
         this.setMinHeight(100, Unit.VH);
         this.setPadding(false);
 
+        AccountRecoveryTokenEntity tokenEntity = service.getTokenEntity(userIdAndToken);
 
         if (tokenEntity != null) {
 
@@ -87,7 +84,7 @@ public class PasswordChangeView extends VerticalLayout implements HasUrlParamete
 
             attachFieldsToValidationBinder();
 
-            savePasswordChange(user, tokenEntity);
+            acceptPasswordChange(user, tokenEntity);
         } else {
 
             FAILURE_STATUS_ICON.setColor(FAILURE_STATUS_ICON_COLOR);
@@ -97,17 +94,6 @@ public class PasswordChangeView extends VerticalLayout implements HasUrlParamete
 
     }
 
-    private AccountRecoveryTokenEntity getTokenEntity(String userIdAndToken) {
-        String[] parameters = userIdAndToken.split("/");
-
-        if (parameters.length != 2) {
-            return null;
-        }
-
-        String userId = parameters[0];
-        String token = parameters[1];
-        return tokenRepository.findByUserIdAndToken(userId, token);
-    }
     private Div createPageView() {
 
         Div card = new Div(getFormLayout());
@@ -173,7 +159,7 @@ public class PasswordChangeView extends VerticalLayout implements HasUrlParamete
         binder.setStatusLabel(errorMessage);
     }
 
-    private void savePasswordChange(UserEntity user, AccountRecoveryTokenEntity tokenEntity) {
+    private void acceptPasswordChange(UserEntity user, AccountRecoveryTokenEntity tokenEntity) {
         submitButton.addClickListener(e -> {
             try {
                 UserEntity userEntity = new UserEntity();
@@ -181,8 +167,7 @@ public class PasswordChangeView extends VerticalLayout implements HasUrlParamete
 
                 user.setPasswordWithoutEncoding(userEntity.getPassword());
 
-                userRepository.save(user);
-                tokenRepository.delete(tokenEntity);
+                service.acceptPasswordChange(user, tokenEntity);
 
                 getUI().ifPresent(ui -> ui.navigate(PasswordSuccessfullyChangedView.class));
             } catch (ValidationException validationException) {

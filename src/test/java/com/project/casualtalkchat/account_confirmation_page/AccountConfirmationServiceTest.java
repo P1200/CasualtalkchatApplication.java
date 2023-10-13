@@ -46,7 +46,7 @@ class AccountConfirmationServiceTest {
     }
 
     @Test
-    void userShouldNotBeConfirmedUserIdAndTokenDoNotMatchAnyDatabaseRow() {
+    void userShouldNotBeConfirmedWhenUserIdAndTokenDoNotMatchAnyDatabaseRow() {
         //Given
         AccountConfirmationService confirmationService =
                 new AccountConfirmationService(tokenRepository, userRepository);
@@ -64,7 +64,7 @@ class AccountConfirmationServiceTest {
     }
 
     @Test
-    void userShouldNotBeConfirmedUserIdAndTokenInWrongFormat() {
+    void userShouldNotBeConfirmedWhenUserIdAndTokenInWrongFormat() {
         //Given
         AccountConfirmationService confirmationService =
                 new AccountConfirmationService(tokenRepository, userRepository);
