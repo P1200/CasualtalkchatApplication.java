@@ -1,35 +1,46 @@
 package com.project.casualtalkchat.common;
 
-import com.project.casualtalkchat.chat_page.UserEntity;
 import com.project.casualtalkchat.security.CustomUserDetails;
 import com.vaadin.flow.server.StreamResource;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserEntityUtils {
 
-    public static StreamResource getAvatarResource(UserEntity userDetails) {
-        return getAvatarResource(userDetails.getAvatarName());
-    }
+    public static final String USER_AVATARS_PATH = "/images/users/avatars/";
+    public static final String DEFAULT_AVATAR_NAME = "default_avatar_image.png";
+    public static final String DEFAULT_AVATAR_PATH = "/images/";
 
     public static StreamResource getAvatarResource(CustomUserDetails userDetails) {
         return getAvatarResource(userDetails.getAvatar());
     }
 
-    private static StreamResource getAvatarResource(String avatarName) {
+    public static StreamResource getAvatarResource(String avatarName) {
         StreamResource imageResource;
         if (avatarName == null) {
-
-            imageResource = new StreamResource("default_avatar_image.png",
-                    () -> UserEntityUtils.class.getResourceAsStream("/images/default_avatar_image.png"));
-
+            imageResource = getDefaultAvatarResource();
         } else {
-
-            imageResource = new StreamResource(avatarName,
-                    () -> UserEntityUtils.class.getResourceAsStream("/images/users/avatars/" +
-                            avatarName));
+            if (UserEntityUtils.class.getResource(USER_AVATARS_PATH + avatarName) != null) {
+                imageResource = new StreamResource(avatarName,
+                        () -> UserEntityUtils.class.getResourceAsStream(USER_AVATARS_PATH + avatarName));
+            } else {
+                log.error("User avatar resource not found.");
+                imageResource = getDefaultAvatarResource();
+            }
         }
         return imageResource;
+    }
+
+    private static StreamResource getDefaultAvatarResource() {
+        if (UserEntityUtils.class.getResource(DEFAULT_AVATAR_PATH + DEFAULT_AVATAR_NAME) != null) {
+            return new StreamResource(DEFAULT_AVATAR_NAME,
+                    () -> UserEntityUtils.class.getResourceAsStream(DEFAULT_AVATAR_PATH + DEFAULT_AVATAR_NAME));
+        } else {
+            log.error("Default avatar resource doesn't exist.");
+            return null;
+        }
     }
 }

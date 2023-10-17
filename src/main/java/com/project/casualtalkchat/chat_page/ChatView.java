@@ -32,14 +32,12 @@ public class ChatView extends VerticalLayout {
     private final ConversationService conversationService;
     private final CustomUserDetails loggedInUserDetails;
     private final MessageList messageList = new MessageList();
-    private final ApplicationEventPublisher eventPublisher;
     private String currentConversationId;
 
-    public ChatView(SecurityService securityService, UserService userService, ConversationService conversationService, ApplicationEventPublisher eventPublisher) {
+    public ChatView(SecurityService securityService, UserService userService, ConversationService conversationService) {
 
         this.service = userService;
         this.conversationService = conversationService;
-        this.eventPublisher = eventPublisher;
 
         ComponentUtil.setData(UI.getCurrent(), ChatView.class, this);
 
@@ -61,14 +59,16 @@ public class ChatView extends VerticalLayout {
         this.currentConversationId = currentConversationId;
         log.debug("Chat was changed");
 
-        List<MessageListItem> items = conversationService.getMessagesList(currentConversationId);
+        List<MessageEntity> messages = conversationService.getMessagesList(currentConversationId);
+        List<MessageListItem> items = new ArrayList<>();
+        addItemForEachMessage(messages, items);
 
         messageList.setItems(items);
     }
 
     private HorizontalLayout getPageLayout(CustomUserDetails userDetails) {
         HorizontalLayout pageLayout =
-                new HorizontalLayout(new TabsSectionComponent(service, conversationService, loggedInUserDetails.getId(), eventPublisher),
+                new HorizontalLayout(new TabsSectionComponent(service, conversationService, loggedInUserDetails.getId()),
                         getChatLayout(userDetails));
         pageLayout.getStyle()
                 .set("margin-top", "46px")
@@ -103,5 +103,20 @@ public class ChatView extends VerticalLayout {
                 .set("border-left", "1px solid rgba(0,0,0,.5)");
         chatLayout.expand(messageList);
         return chatLayout;
+    }
+
+    private void addItemForEachMessage(List<MessageEntity> messages, List<MessageListItem> items) {
+        for (MessageEntity message : messages) {
+            Instant messageSentTime = message.getSentTime()
+                    .toInstant();
+            String senderUsername = message.getSender()
+                    .getUsername();
+            MessageListItem item = new MessageListItem(message.getContent(),
+                    messageSentTime, senderUsername);
+            item.setUserImageResource(UserEntityUtils.getAvatarResource(message.getSender()
+                    .getAvatarName()));
+
+            items.add(item);
+        }
     }
 }

@@ -3,7 +3,8 @@ package com.project.casualtalkchat.register_page;
 import com.project.casualtalkchat.emailing.EmailViewTemplate;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.MessageSource;
 import org.springframework.lang.NonNull;
@@ -13,22 +14,21 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
+@Slf4j
+@AllArgsConstructor
 @Component
 public class RegistrationListener implements ApplicationListener<OnRegistrationCompleteEvent> {
 
-    @Autowired
     private UserRegistrationService service;
-    @Autowired
     private MessageSource messages;
-    @Autowired
     private JavaMailSender mailSender;
 
     @Override
     public void onApplicationEvent(@NonNull OnRegistrationCompleteEvent event) {
         try {
-            this.sendConfirmRegistrationEmail(event);
+            sendConfirmRegistrationEmail(event);
         } catch (MessagingException e) {
-            throw new RuntimeException(e); //TODO
+            log.error("Confirm registration email has not been sent.");
         }
     }
 

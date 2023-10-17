@@ -6,16 +6,22 @@ import com.vaadin.flow.data.provider.Query;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class FriendsDataProvider extends AbstractBackEndDataProvider<UserEntity, UserFilter> {
+public class FriendDataProvider extends AbstractBackEndDataProvider<UserEntity, UserFilter> {
 
     private final UserService userService;
     private final String currentUserId;
     private List<UserEntity> userEntities;
 
-    public FriendsDataProvider(UserService service, String currentUserId) {
+    public FriendDataProvider(UserService service, String currentUserId) {
         userService = service;
         this.currentUserId = currentUserId;
         userEntities = service.getAllFriends(currentUserId); //TODO I think it's not good to get all data at once
+    }
+
+    @Override
+    public void refreshAll() {
+        userEntities = userService.getAllFriends(currentUserId);
+        super.refreshAll();
     }
 
     @Override
@@ -32,11 +38,5 @@ public class FriendsDataProvider extends AbstractBackEndDataProvider<UserEntity,
     @Override
     protected int sizeInBackEnd(Query<UserEntity, UserFilter> query) {
         return (int) fetchFromBackEnd(query).count();
-    }
-
-    @Override
-    public void refreshAll() {
-        userEntities = userService.getAllFriends(currentUserId);
-        super.refreshAll();
     }
 }

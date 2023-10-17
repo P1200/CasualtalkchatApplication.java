@@ -51,11 +51,6 @@
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-spring-boot-starter</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.parttio</groupId>
-			<artifactId>line-awesome</artifactId>
-			<version>1.1.0</version>
-		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -69,11 +64,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-testbench-junit5</artifactId>
 			<scope>test</scope>
 		</dependency>
 
@@ -94,7 +84,6 @@
 			<version>2.0.7</version>
 			<scope>test</scope>
 		</dependency>
-
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -156,88 +145,40 @@
 		</resources>
 	</build>
 
-	<profiles>
-		<profile>
-			<!-- Production mode is activated using -Pproduction -->
-			<id>production</id>
-			<dependencies>
-				<!-- Exclude development dependencies from production -->
-				<dependency>
-					<groupId>com.vaadin</groupId>
-					<artifactId>vaadin-core</artifactId>
-					<exclusions>
-						<exclusion>
-							<groupId>com.vaadin</groupId>
-							<artifactId>vaadin-dev</artifactId>
-						</exclusion>
-					</exclusions>
-				</dependency>
-			</dependencies>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>com.vaadin</groupId>
-						<artifactId>vaadin-maven-plugin</artifactId>
-						<version>${vaadin.version}</version>
-						<executions>
-							<execution>
-								<goals>
-									<goal>build-frontend</goal>
-								</goals>
-								<phase>compile</phase>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<profile>
-			<id>it</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.springframework.boot</groupId>
-						<artifactId>spring-boot-maven-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>start-spring-boot</id>
-								<phase>pre-integration-test</phase>
-								<goals>
-									<goal>start</goal>
-								</goals>
-							</execution>
-							<execution>
-								<id>stop-spring-boot</id>
-								<phase>post-integration-test</phase>
-								<goals>
-									<goal>stop</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
-					<!-- Runs the integration tests (*IT) after the server is started -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-failsafe-plugin</artifactId>
-						<executions>
-							<execution>
-								<goals>
-									<goal>integration-test</goal>
-									<goal>verify</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<trimStackTrace>false</trimStackTrace>
-							<enableAssertions>true</enableAssertions>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-	</profiles>
-
+<!--	<profiles>-->
+<!--		<profile>-->
+<!--			&lt;!&ndash; Production mode is activated using -Pproduction &ndash;&gt;-->
+<!--			<id>production</id>-->
+<!--			<dependencies>-->
+<!--				&lt;!&ndash; Exclude development dependencies from production &ndash;&gt;-->
+<!--				<dependency>-->
+<!--					<groupId>com.vaadin</groupId>-->
+<!--					<artifactId>vaadin-core</artifactId>-->
+<!--					<exclusions>-->
+<!--						<exclusion>-->
+<!--							<groupId>com.vaadin</groupId>-->
+<!--							<artifactId>vaadin-dev</artifactId>-->
+<!--						</exclusion>-->
+<!--					</exclusions>-->
+<!--				</dependency>-->
+<!--			</dependencies>-->
+<!--			<build>-->
+<!--				<plugins>-->
+<!--					<plugin>-->
+<!--						<groupId>com.vaadin</groupId>-->
+<!--						<artifactId>vaadin-maven-plugin</artifactId>-->
+<!--						<version>${vaadin.version}</version>-->
+<!--						<executions>-->
+<!--							<execution>-->
+<!--								<goals>-->
+<!--									<goal>build-frontend</goal>-->
+<!--								</goals>-->
+<!--								<phase>compile</phase>-->
+<!--							</execution>-->
+<!--						</executions>-->
+<!--					</plugin>-->
+<!--				</plugins>-->
+<!--			</build>-->
+<!--		</profile>-->
+<!--	</profiles>-->
 </project>

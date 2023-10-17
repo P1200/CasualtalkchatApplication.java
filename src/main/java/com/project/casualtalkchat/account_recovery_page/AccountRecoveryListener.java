@@ -4,7 +4,6 @@ import com.project.casualtalkchat.emailing.EmailViewTemplate;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.MessageSource;
 import org.springframework.lang.NonNull;
@@ -16,12 +15,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class AccountRecoveryListener implements ApplicationListener<OnAccountRecoveryRequestedEvent> {
 
-    @Autowired
-    private UserAccountRecoveryService service;
-    @Autowired
-    private MessageSource messages;
-    @Autowired
-    private JavaMailSender mailSender;
+    private final UserAccountRecoveryService service;
+    private final MessageSource messages;
+    private final JavaMailSender mailSender;
+
+    public AccountRecoveryListener(UserAccountRecoveryService service, MessageSource messages, JavaMailSender mailSender) {
+        this.service = service;
+        this.messages = messages;
+        this.mailSender = mailSender;
+    }
 
     @Override
     public void onApplicationEvent(@NonNull OnAccountRecoveryRequestedEvent event) {
@@ -33,16 +35,16 @@ public class AccountRecoveryListener implements ApplicationListener<OnAccountRec
                 sendAccountRecoveryEmail(event, user);
                 log.info("Account recovery email has been sent to: " + event.getEmail() + ".");
             } catch (MessagingException e) {
-                throw new RuntimeException(e); //TODO
+                log.warn("Account recovery email has not been sent to: " + event.getEmail() + ".");
             }
         } else {
-            log.debug("User with email: " + event.getEmail() + " doesn't exist.");
+            log.info("User with email: " + event.getEmail() + " doesn't exist.");
         }
     }
 
     private void sendAccountRecoveryEmail(OnAccountRecoveryRequestedEvent event, UserEntity user) throws MessagingException {
 
-        String token = service.createRecoveryTokenForUser(user);
+        String token = service.getRecoveryTokenForUser(user);
 
         mailSender.send(getMimeMessage(event, token, user));
     }

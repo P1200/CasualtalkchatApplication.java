@@ -1,4 +1,4 @@
-package com.project.casualtalkchat.account_confirmed_page;
+package com.project.casualtalkchat.account_confirmation_page;
 
 import com.project.casualtalkchat.common.OperationStatusView;
 import com.project.casualtalkchat.security.SecurityService;
@@ -12,7 +12,6 @@ import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.WildcardParameter;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Route("registration-confirm")
 @AnonymousAllowed
@@ -20,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @JavaScript("https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js")
 @StyleSheet("https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css")
 @JavaScript("https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js")
-public class AccountConfirmedView extends VerticalLayout implements HasUrlParameter<String> {
+public class AccountConfirmationView extends VerticalLayout implements HasUrlParameter<String> {
 
     private static final String SUCCESS_HEADER_TEXT = "Your account has been successfully confirmed";
     private static final String FAILURE_HEADER_TEXT = "Your account has not been successfully confirmed";
@@ -31,40 +30,28 @@ public class AccountConfirmedView extends VerticalLayout implements HasUrlParame
     private static final String ACCOUNT_NOT_VERIFIED_TEXT = "Your account has not been successfully confirmed. " +
             "Please check if your verification code is valid and correctly typed.";
     private static final Icon FAILURE_STATUS_ICON = new Icon("lumo", "cross");
-    private static final Icon SUCCESS_STATUS_ICON = new Icon(VaadinIcon.CHECK_CIRCLE);
+    private static final Icon SUCCESS_STATUS_ICON = VaadinIcon.CHECK_CIRCLE.create();
     private static final String FAILURE_STATUS_ICON_COLOR = "red";
     private static final String SUCCESS_STATUS_ICON_COLOR = "green";
 
-    private final VerificationTokenRepository tokenRepository;
-    private final UserRepository userRepository;
+    private final AccountConfirmationService confirmationService;
     private final SecurityService securityService;
 
-    public AccountConfirmedView(@Autowired VerificationTokenRepository tokenRepository,
-                                @Autowired UserRepository userRepository,
-                                SecurityService securityService) {
+    public AccountConfirmationView(AccountConfirmationService confirmationService, SecurityService securityService) {
         this.securityService = securityService;
-        this.tokenRepository = tokenRepository;
-        this.userRepository = userRepository;
+        this.confirmationService = confirmationService;
     }
 
     @Override
     public void setParameter(BeforeEvent beforeEvent, @WildcardParameter String userIdAndToken) {
 
-        VerificationTokenEntity tokenEntity = getVerificationTokenEntity(userIdAndToken);
-        //TODO verification token should be deleted after use
-
         this.getStyle()
                 .setBackground("#f3f4f6");
         this.setPadding(false);
 
+        boolean isUserConfirmed = confirmationService.confirmUser(userIdAndToken);
 
-        if (tokenEntity != null) {
-
-            UserEntity user = tokenEntity.getUser();
-            user.setAccountConfirmed(true);
-
-            userRepository.save(user);
-
+        if (isUserConfirmed) {
             SUCCESS_STATUS_ICON.setColor(SUCCESS_STATUS_ICON_COLOR);
 
             add(new OperationStatusView(securityService, SUCCESS_STATUS_ICON, SUCCESS_HEADER_TEXT, OPERATION_SUCCEEDED_TEXT, ACCOUNT_VERIFIED_TEXT));
@@ -74,18 +61,5 @@ public class AccountConfirmedView extends VerticalLayout implements HasUrlParame
 
             add(new OperationStatusView(securityService, FAILURE_STATUS_ICON, FAILURE_HEADER_TEXT, OPERATION_FAILED_TEXT, ACCOUNT_NOT_VERIFIED_TEXT));
         }
-
-    }
-
-    private VerificationTokenEntity getVerificationTokenEntity(String userIdAndToken) {
-        String[] parameters = userIdAndToken.split("/");
-
-        if (parameters.length != 2) {
-            return null;
-        }
-
-        String userId = parameters[0];
-        String token = parameters[1];
-        return tokenRepository.findByUserIdAndToken(userId, token);
     }
 }

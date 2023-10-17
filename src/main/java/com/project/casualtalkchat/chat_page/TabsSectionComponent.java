@@ -1,6 +1,8 @@
 package com.project.casualtalkchat.chat_page;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.ComponentUtil;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.avatar.AvatarGroup;
 import com.vaadin.flow.component.button.Button;
@@ -42,14 +44,12 @@ public class TabsSectionComponent extends Div {
     private final UserService userService;
     private final ConversationService conversationService;
     private final String userId;
-    private final ApplicationEventPublisher eventPublisher;
     private final TabSheet tabSheet;
     private final Tab chats;
     private Grid<ConversationEntity> conversationsGrid;
 
-    public TabsSectionComponent(UserService userService, ConversationService conversationService, String userId, ApplicationEventPublisher eventPublisher) {
+    public TabsSectionComponent(UserService userService, ConversationService conversationService, String userId) {
 
-        this.eventPublisher = eventPublisher;
         this.userId = userId;
         this.userService = userService;
         this.conversationService = conversationService;
@@ -59,10 +59,10 @@ public class TabsSectionComponent extends Div {
         InvitationsDataProvider invitationsDataProvider = new InvitationsDataProvider(userService, userId);
         this.invitationFilterDataProvider = invitationsDataProvider.withConfigurableFilter();
 
-        FriendsDataProvider friendsDataProvider = new FriendsDataProvider(userService, userId);
-        this.friendFilterDataProvider = friendsDataProvider.withConfigurableFilter();
+        FriendDataProvider friendDataProvider = new FriendDataProvider(userService, userId);
+        this.friendFilterDataProvider = friendDataProvider.withConfigurableFilter();
 
-        ChatsDataProvider conversationDataProvider = new ChatsDataProvider(conversationService, userId);
+        ConversationDataProvider conversationDataProvider = new ConversationDataProvider(conversationService, userId);
         this.conversationFilterDataProvider = conversationDataProvider.withConfigurableFilter();
 
         tabSheet = new TabSheet();
@@ -220,8 +220,9 @@ public class TabsSectionComponent extends Div {
         });
 
         conversationsGrid.addItemClickListener(conversation -> {
-            log.debug("On chat selected event has been published.");
-            eventPublisher.publishEvent(new OnChatSelectedEvent(conversation.getItem().getId()));
+            log.debug("Chat has been changed.");
+            ComponentUtil.getData(UI.getCurrent(), ChatView.class)
+                        .changeChat(conversation.getItem().getId());
         });
 
         return getLayoutForChats(conversationsGrid, conversationFilterDataProvider);
@@ -268,7 +269,7 @@ public class TabsSectionComponent extends Div {
         Grid<ConversationEntity> grid = new Grid<>();
         grid.addComponentColumn(getConversationMiniature());
 
-        grid.addColumn(getConversationName(), "username");
+        grid.addColumn(ConversationEntity::getName, "name");
         return grid;
     }
 
@@ -281,27 +282,11 @@ public class TabsSectionComponent extends Div {
                 if (idsNotEqual(person.getId(), userId)) {
                     AvatarGroup.AvatarGroupItem avatar = new AvatarGroup.AvatarGroupItem(
                             person.getUsername());
-                    avatar.setImageResource(getAvatarResource(person));
+                    avatar.setImageResource(getAvatarResource(person.getAvatarName()));
                     avatars.add(avatar);
                 }
             }
             return avatars;
-        };
-    }
-
-    private ValueProvider<ConversationEntity, String> getConversationName() {
-        return conversation -> {
-            if (conversation.getName() == null) {
-                StringBuilder conversationName = new StringBuilder();
-                for (UserEntity person : conversation.getMembers()) {
-                    if (idsNotEqual(person.getId(), userId)) {
-                        conversationName.append(person.getUsername());
-                    }
-                }
-                return conversationName.toString();
-            } else {
-                return conversation.getName();
-            }
         };
     }
 
@@ -312,7 +297,7 @@ public class TabsSectionComponent extends Div {
     private Grid<UserEntity> getUserEntityGrid() {
         Grid<UserEntity> grid = new Grid<>();
         grid.addComponentColumn(userEntity -> {
-            Image avatar = new Image(getAvatarResource(userEntity), "avatar");
+            Image avatar = new Image(getAvatarResource(userEntity.getAvatarName()), "avatar");
             avatar.setWidth(50, Unit.PERCENTAGE);
             return avatar;
         });

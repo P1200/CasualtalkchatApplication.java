@@ -5,6 +5,7 @@ import com.project.casualtalkchat.security.SecurityService;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.Unit;
+import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.dependency.JavaScript;
@@ -75,7 +76,8 @@ public class TopBar extends HorizontalLayout {
     }
 
     private Div getAccountComponent(CustomUserDetails userDetails) {
-        Image avatar = new Image(getAvatarResource(userDetails), "Avatar image");
+        Avatar avatar = new Avatar();
+        avatar.setImageResource(getAvatarResource(userDetails));
         avatar.getStyle()
                 .setWidth("40px")
                 .set("margin-right", "0.5rem");

@@ -1,4 +1,4 @@
-package com.project.casualtalkchat.register_page;
+package com.project.casualtalkchat.emailing;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;

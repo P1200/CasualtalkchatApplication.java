@@ -3,16 +3,16 @@ package com.project.casualtalkchat.password_change_page;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.sql.Date;
-
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@ToString
 @Entity(name = "password-change-page-user-entity")
 @Table(name = "user")
 public class UserEntity {
@@ -25,8 +25,6 @@ public class UserEntity {
     @Length(min = 1, max = 32)
     private String username;
 
-    private String avatarName;
-
     @Email
     private String email;
 
@@ -34,11 +32,13 @@ public class UserEntity {
     @Length(max = 60)
     private String password;
 
-    private boolean isAccountConfirmed;
-
-    private boolean isServiceTermsAccepted;
-
-    private Date creationDate;
+    public UserEntity(String id, String username, String email, String password) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        this.password = passwordEncoder.encode(password);
+    }
 
     public void setPassword(String password) {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
