@@ -2,6 +2,7 @@ package com.project.casualtalkchat.register_page;
 
 import com.project.casualtalkchat.account_created_page.AccountSuccessfullyCreatedView;
 import com.project.casualtalkchat.common.BottomBar;
+import com.project.casualtalkchat.common.FileCouldNotBeSavedException;
 import com.project.casualtalkchat.common.PasswordValidator;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
@@ -23,7 +24,6 @@ import com.vaadin.flow.server.VaadinServlet;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.springframework.context.ApplicationEventPublisher;
 
-import java.io.FileNotFoundException;
 import java.util.Set;
 
 @Route("register")
@@ -116,16 +116,17 @@ public class RegisterView extends VerticalLayout {
         formLayout.setColspan(errorMessage, 2);
         formLayout.setColspan(submitButton, 2);
 
-        errorMessage.getStyle().set("color", "var(--lumo-error-text-color)");
-        errorMessage.getStyle().set("padding", "15px 0");
+        errorMessage.getStyle()
+                    .set("color", "var(--lumo-error-text-color)");
+        errorMessage.getStyle()
+                    .set("padding", "15px 0");
         return formLayout;
     }
 
     private FormLayout.ResponsiveStep getResponsiveStep(String minWidth, int columns) {
-        return new FormLayout.ResponsiveStep(minWidth, columns,
-                FormLayout.ResponsiveStep
-                        .LabelsPosition
-                        .TOP);
+        return new FormLayout.ResponsiveStep(minWidth, columns, FormLayout.ResponsiveStep
+                                                                            .LabelsPosition
+                                                                            .TOP);
     }
 
     private void attachFieldsToValidationBinder() {
@@ -193,7 +194,7 @@ public class RegisterView extends VerticalLayout {
                 getUI().ifPresent(ui -> ui.navigate(AccountSuccessfullyCreatedView.class));
             } catch (ValidationException | UserAlreadyExistException validationException) {
                 errorMessage.setText(validationException.getMessage());
-            } catch (FileNotFoundException notFoundException) {
+            } catch (FileCouldNotBeSavedException notFoundException) {
                 errorMessage.setText("Something went wrong with saving your avatar image, please try again");
             }
         });
