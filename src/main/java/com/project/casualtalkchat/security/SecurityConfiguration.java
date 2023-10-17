@@ -3,7 +3,7 @@ package com.project.casualtalkchat.security;
 import com.project.casualtalkchat.login_page.LoginView;
 import com.project.casualtalkchat.login_page.UserLoginService;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -13,14 +13,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+@AllArgsConstructor
 @EnableWebSecurity
 @Configuration
 public class SecurityConfiguration extends VaadinWebSecurity {
 
-    @Autowired
     UserLoginService userLoginService;
-
-    @Autowired
     CustomAuthenticationManager customAuthenticationManager;
 
     @Bean
