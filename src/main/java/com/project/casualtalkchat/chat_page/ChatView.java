@@ -7,16 +7,17 @@ import com.project.casualtalkchat.security.SecurityService;
 import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Unit;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.messages.MessageInput;
-import com.vaadin.flow.component.messages.MessageList;
-import com.vaadin.flow.component.messages.MessageListItem;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.lumo.LumoUtility;
 import jakarta.annotation.security.PermitAll;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.Instant;
@@ -26,6 +27,7 @@ import java.util.List;
 @Route("chat")
 @PermitAll
 @Slf4j
+@CssImport("./styles.css")
 public class ChatView extends VerticalLayout {
 
     private final UserService service;
@@ -33,6 +35,8 @@ public class ChatView extends VerticalLayout {
     private final CustomUserDetails loggedInUserDetails;
     private final MessageList messageList = new MessageList();
     private String currentConversationId;
+    private MemoryBuffer buffer = new MemoryBuffer();
+    private Upload upload = new Upload(buffer);
 
     public ChatView(SecurityService securityService, UserService userService, ConversationService conversationService) {
 
@@ -81,13 +85,12 @@ public class ChatView extends VerticalLayout {
     private VerticalLayout getChatLayout(CustomUserDetails userDetails) {
         messageList.setWidthFull();
         MessageInput input = new MessageInput();
+
         input.setWidth(100, Unit.PERCENTAGE);
         input.addSubmitListener(submitEvent -> {
             MessageListItem newMessage = new MessageListItem(
-                    submitEvent.getValue(), Instant.now(), userDetails.getUsername());
-            newMessage.setUserImageResource(UserEntityUtils.getAvatarResource(userDetails));
-            newMessage.addThemeNames(LumoUtility.AlignContent.END,
-                    LumoUtility.AlignItems.END, LumoUtility.Background.CONTRAST_5); //TODO idk how to do that
+                    submitEvent.getValue(), Instant.now(), userDetails.getUsername(),
+                    UserEntityUtils.getAvatarResource(userDetails));
             List<MessageListItem> items = new ArrayList<>(messageList.getItems());
             items.add(newMessage);
             messageList.setItems(items);
@@ -97,11 +100,16 @@ public class ChatView extends VerticalLayout {
             }
         });
 
-        VerticalLayout chatLayout = new VerticalLayout(messageList, input);
+        upload.getElement().appendChild(input.getElement());
+        upload.setUploadButton(new Button(VaadinIcon.UPLOAD.create()));
+
+        VerticalLayout chatLayout = new VerticalLayout(messageList, upload);
         chatLayout.setWidth(75, Unit.PERCENTAGE);
         chatLayout.getStyle()
                 .set("border-left", "1px solid rgba(0,0,0,.5)");
+
         chatLayout.expand(messageList);
+        chatLayout.getStyle().set("padding-bottom", "0");
         return chatLayout;
     }
 
@@ -112,8 +120,7 @@ public class ChatView extends VerticalLayout {
             String senderUsername = message.getSender()
                     .getUsername();
             MessageListItem item = new MessageListItem(message.getContent(),
-                    messageSentTime, senderUsername);
-            item.setUserImageResource(UserEntityUtils.getAvatarResource(message.getSender()
+                    messageSentTime, senderUsername, UserEntityUtils.getAvatarResource(message.getSender()
                     .getAvatarName()));
 
             items.add(item);

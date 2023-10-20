@@ -220,3 +220,33 @@ vaadin-login-form-wrapper::part(form-title) {
 vaadin-message::part(message) {
   overflow-wrap: anywhere;
 }
+
+/*Create grid for message input*/
+vaadin-upload {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 10fr;
+  grid-template-rows: auto auto;
+  border: none;
+}
+
+vaadin-message-input {
+  width: 100%;
+  height: fit-content;
+  max-height: 100px;
+  grid-area: 2 / 2 / 3 / 3;
+}
+
+vaadin-upload > vaadin-button {
+  margin-top: 11px;
+  grid-area: 2 / 1 / 3 / 2;
+}
+
+vaadin-upload-file-list {
+  grid-area: 1 / 1 / 2 / 3;
+}
+
+vaadin-upload::part(drop-label) {
+  display: none;
+}
+/*Grid end*/
