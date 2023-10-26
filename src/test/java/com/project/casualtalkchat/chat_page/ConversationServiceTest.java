@@ -1,5 +1,6 @@
 package com.project.casualtalkchat.chat_page;
 
+import com.project.casualtalkchat.common.UserImagesRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -31,14 +32,20 @@ class ConversationServiceTest {
     @Mock
     private ConversationRepository repository;
     @Mock
+    private AttachmentRepository attachmentRepository;
+    @Mock
     private MessageRepository messageRepository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+
+    private UserImagesRepository resourcesRepository;
 
     @Test
     void shouldCreateNewConversation() { //TODO add IT tests for this method
         //Given
-        ConversationService service = new ConversationService(repository, userRepository, messageRepository);
+        ConversationService service =
+                new ConversationService(repository, attachmentRepository, messageRepository, userRepository, resourcesRepository);
         when(userRepository.getReferenceById(anyString()))
                 .thenReturn(prepareUserEntity(ADMIN_ID, ADMIN_USERNAME, ADMIN_EMAIL));
 
@@ -52,7 +59,8 @@ class ConversationServiceTest {
     @Test
     void shouldGetUserConversations() { //TODO add IT tests for this method
         //Given
-        ConversationService service = new ConversationService(repository, userRepository, messageRepository);
+        ConversationService service =
+                new ConversationService(repository, attachmentRepository, messageRepository, userRepository, resourcesRepository);
         List<ConversationEntity> conversationEntities = prepareConversations();
         when(repository.getAllByAdminsIdOrMembersId(anyString(), anyString())).thenReturn(conversationEntities);
 
@@ -66,7 +74,8 @@ class ConversationServiceTest {
     @Test
     void shouldRemoveConversation() {
         //Given
-        ConversationService service = new ConversationService(repository, userRepository, messageRepository);
+        ConversationService service =
+                new ConversationService(repository, attachmentRepository, messageRepository, userRepository, resourcesRepository);
 
         //When
         service.removeConversation(prepareConversationEntityWithoutMessages(prepareUserEntity(ADMIN_ID, ADMIN_USERNAME, ADMIN_EMAIL),
@@ -79,12 +88,13 @@ class ConversationServiceTest {
     @Test
     void shouldGetConversationMessages() {
         //Given
-        ConversationService service = new ConversationService(repository, userRepository, messageRepository);
+        ConversationService service =
+                new ConversationService(repository, attachmentRepository, messageRepository, userRepository, resourcesRepository);
         UserEntity userEntity = prepareUserEntity(USER_ID, USERNAME, EMAIL);
         UserEntity adminUserEntity = prepareUserEntity(ADMIN_ID, ADMIN_USERNAME, ADMIN_EMAIL);
         List<MessageEntity> messageEntities =
-                List.of(prepareMessageEntity(MessageType.TEXT, userEntity, Timestamp.from(FIRST_MESSAGE_SENT_TIME), FIRST_MESSAGE_TEXT),
-                        prepareMessageEntity(MessageType.TEXT, adminUserEntity, Timestamp.from(SECOND_MESSAGE_SENT_TIME), SECOND_MESSAGE_TEXT));
+                List.of(prepareMessageEntity(userEntity, Timestamp.from(FIRST_MESSAGE_SENT_TIME), FIRST_MESSAGE_TEXT),
+                        prepareMessageEntity(adminUserEntity, Timestamp.from(SECOND_MESSAGE_SENT_TIME), SECOND_MESSAGE_TEXT));
         when(messageRepository.getAllByConversationIdOrderBySentTime(CONVERSATION_ID)).thenReturn(messageEntities);
 
         //When
@@ -97,7 +107,8 @@ class ConversationServiceTest {
     @Test
     void shouldGetConversationMessageEmptyList() {
         //Given
-        ConversationService service = new ConversationService(repository, userRepository, messageRepository);
+        ConversationService service =
+                new ConversationService(repository, attachmentRepository, messageRepository, userRepository, resourcesRepository);
         List<MessageEntity> messageEntities = Collections.emptyList();
         when(messageRepository.getAllByConversationIdOrderBySentTime(CONVERSATION_ID)).thenReturn(messageEntities);
 
@@ -111,7 +122,8 @@ class ConversationServiceTest {
     @Test
     void shouldSaveNewMessage() {
         //Given
-        ConversationService service = new ConversationService(repository, userRepository, messageRepository);
+        ConversationService service =
+                new ConversationService(repository, attachmentRepository, messageRepository, userRepository, resourcesRepository);
         when(userRepository.getReferenceById(anyString())).thenReturn(prepareUserEntity(USER_ID, USERNAME, EMAIL));
         when(repository.getReferenceById(CONVERSATION_ID))
                 .thenReturn(prepareConversationEntityWithoutMessages(prepareUserEntity(ADMIN_ID, ADMIN_USERNAME, ADMIN_EMAIL),
@@ -144,9 +156,8 @@ class ConversationServiceTest {
         return conversationEntities;
     }
 
-    private MessageEntity prepareMessageEntity(MessageType messageType, UserEntity sender, Timestamp sentTime, String content) {
+    private MessageEntity prepareMessageEntity(UserEntity sender, Timestamp sentTime, String content) {
         return MessageEntity.builder()
-                            .type(messageType)
                             .sender(sender)
                             .sentTime(sentTime)
                             .content(content)

@@ -1,6 +1,6 @@
 package com.project.casualtalkchat.register_page;
 
-import com.project.casualtalkchat.common.ApplicationResourcesRepository;
+import com.project.casualtalkchat.common.UserImagesRepository;
 import com.project.casualtalkchat.common.FileCouldNotBeSavedException;
 import com.project.casualtalkchat.common.UserEntityUtils;
 import lombok.AllArgsConstructor;
@@ -13,10 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class UserRegistrationService {
 
-    public static final String PATH_TO_AVATARS_DIRECTORY = "src/main/resources" + UserEntityUtils.USER_AVATARS_PATH;
+    public static final String PATH_TO_AVATARS_DIRECTORY = UserEntityUtils.USER_AVATARS_PATH;
     private final UserRepository userRepository;
     private final VerificationTokenRepository tokenRepository;
-    private final ApplicationResourcesRepository resourcesRepository;
+    private final UserImagesRepository resourcesRepository;
 
     public UserEntity registerNewUserAccount(UserEntity user) throws UserAlreadyExistException {
         throwExceptionIfUserWithThatEmailExists(user.getEmail());

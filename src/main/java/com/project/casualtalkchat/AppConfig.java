@@ -1,7 +1,6 @@
 package com.project.casualtalkchat;
 
-import com.project.casualtalkchat.common.ApplicationResourcesRepository;
-import com.project.casualtalkchat.common.FileCouldNotBeSavedException;
+import com.project.casualtalkchat.common.UserImagesRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -9,12 +8,9 @@ import org.springframework.context.annotation.Configuration;
 public class AppConfig {
 
     @Bean
-    public ApplicationResourcesRepository resourcesRepository() {
-        return new ApplicationResourcesRepository() {
-            @Override
-            public void saveFile(String path, byte[] file) throws FileCouldNotBeSavedException {
-                ApplicationResourcesRepository.super.saveFile(path, file);
-            }
+    public UserImagesRepository resourcesRepository() {
+        return new UserImagesRepository() {
+
         };
     }
 }

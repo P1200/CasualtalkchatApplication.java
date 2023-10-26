@@ -1,6 +1,6 @@
 package com.project.casualtalkchat.register_page;
 
-import com.project.casualtalkchat.common.ApplicationResourcesRepository;
+import com.project.casualtalkchat.common.UserImagesRepository;
 import com.project.casualtalkchat.common.FileCouldNotBeSavedException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +27,7 @@ class UserRegistrationServiceTest {
     @Mock
     private VerificationTokenRepository tokenRepository;
     @Mock
-    private ApplicationResourcesRepository resourcesRepository;
+    private UserImagesRepository resourcesRepository;
 
     @Test
     void shouldRegisterNewUserAccountWithoutAvatar() throws UserAlreadyExistException {

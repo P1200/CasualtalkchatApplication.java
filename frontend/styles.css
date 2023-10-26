@@ -217,10 +217,6 @@ vaadin-login-form-wrapper::part(form-title) {
   margin: 0 auto 30px;
 }
 
-vaadin-message::part(message) {
-  overflow-wrap: anywhere;
-}
-
 /*Create grid for message input*/
 vaadin-upload {
   width: 100%;
@@ -243,6 +239,9 @@ vaadin-upload > vaadin-button {
 }
 
 vaadin-upload-file-list {
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-bottom: 30px;
   grid-area: 1 / 1 / 2 / 3;
 }
 

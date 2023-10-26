@@ -10,4 +10,6 @@ public interface MessageRepository extends JpaRepository<MessageEntity, String> 
 
     List<MessageEntity> getAllByConversationIdOrderBySentTime(String conversationId);
 
+    void deleteAllByConversationId(String id);
+
 }
