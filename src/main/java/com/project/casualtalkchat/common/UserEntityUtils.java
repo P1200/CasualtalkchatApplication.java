@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserEntityUtils {
 
-    public static final String USER_AVATARS_PATH = "/images/users/avatars/";
+    public static final String USER_AVATARS_PATH = "avatars/";
     public static final String DEFAULT_AVATAR_NAME = "default_avatar_image.png";
     public static final String DEFAULT_AVATAR_PATH = "/images/";
 
@@ -27,7 +27,7 @@ public class UserEntityUtils {
                 imageResource = new StreamResource(avatarName,
                         () -> UserEntityUtils.class.getResourceAsStream(USER_AVATARS_PATH + avatarName));
             } else {
-                log.error("User avatar resource not found.");
+                log.debug("User avatar resource not found.");
                 imageResource = getDefaultAvatarResource();
             }
         }

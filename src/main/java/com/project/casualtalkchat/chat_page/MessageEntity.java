@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,8 +22,8 @@ public class MessageEntity {
 
     private String content;
 
-    @Enumerated
-    private MessageType type;
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    private List<AttachmentEntity> attachments;
 
     private Timestamp sentTime;
 
