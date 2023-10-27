@@ -8,7 +8,7 @@ import java.util.List;
 
 @Getter
 @Setter
-@EqualsAndHashCode
+@ToString
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,8 +28,10 @@ public class MessageEntity {
     private Timestamp sentTime;
 
     @ManyToOne
+    @ToString.Exclude
     private ConversationEntity conversation;
 
     @ManyToOne
+    @ToString.Exclude
     private UserEntity sender;
 }

@@ -35,7 +35,7 @@ public class ChatView extends VerticalLayout {
     private final UserService service;
     private final ConversationService conversationService;
     private final CustomUserDetails loggedInUserDetails;
-    private final MessageList messageList = new MessageList();
+    private final MessageList messageList;
     private final MultiFileBuffer buffer = new MultiFileBuffer();
     private final Upload upload = new Upload(buffer);
     private final ArrayList<Attachment> fileList = new ArrayList<>();
@@ -45,6 +45,7 @@ public class ChatView extends VerticalLayout {
 
         this.service = userService;
         this.conversationService = conversationService;
+        this.messageList = new MessageList(new MessageDataProvider(conversationService, 15, currentConversationId));
 
         ComponentUtil.setData(UI.getCurrent(), ChatView.class, this);
 
@@ -62,12 +63,8 @@ public class ChatView extends VerticalLayout {
 
         this.currentConversationId = currentConversationId;
         log.debug("Chat was changed");
-
-        List<MessageEntity> messages = conversationService.getMessagesList(currentConversationId);
-        List<MessageListItem> items = new ArrayList<>();
-        addItemForEachMessage(messages, items);
-
-        messageList.setItems(items);
+        messageList.setDataProvider(new MessageDataProvider(conversationService, 15, currentConversationId));
+        messageList.reload();
     }
 
     private HorizontalLayout getPageLayout(CustomUserDetails userDetails) {
@@ -88,7 +85,7 @@ public class ChatView extends VerticalLayout {
 
         input.addSubmitListener(submitEvent -> {
 
-            List<MessageListItem> items = new ArrayList<>(messageList.getItems());
+            List<MessageListItem> items = new ArrayList<>();
             if (buffer.getFiles().isEmpty()) {
                 MessageListItem newMessage = new MessageListItem(
                         submitEvent.getValue(), Instant.now(), userDetails.getUsername(),
@@ -115,7 +112,7 @@ public class ChatView extends VerticalLayout {
                 items.add(newMessage);
             }
 
-            messageList.setItems(items);
+            messageList.addItems(items);
         });
 
         upload.getElement().appendChild(input.getElement());
@@ -147,29 +144,5 @@ public class ChatView extends VerticalLayout {
         chatLayout.expand(messageList);
         chatLayout.getStyle().set("padding-bottom", "0");
         return chatLayout;
-    }
-
-    private void addItemForEachMessage(List<MessageEntity> messages, List<MessageListItem> items) {
-        for (MessageEntity message : messages) {
-            Instant messageSentTime = message.getSentTime()
-                    .toInstant();
-            String senderUsername = message.getSender()
-                    .getUsername();
-
-            MessageListItem item;
-            if (message.getAttachments().isEmpty()) {
-                item = new MessageListItem(message.getContent(),
-                        messageSentTime, senderUsername, UserEntityUtils.getAvatarResource(message.getSender()
-                        .getAvatarName()));
-            } else {
-                List<Attachment> attachmentResources =
-                        conversationService.getMessageAttachmentResources(message.getAttachments());
-                item = new MessageListItem(attachmentResources, message.getContent(),
-                        messageSentTime, senderUsername, UserEntityUtils.getAvatarResource(message.getSender()
-                        .getAvatarName()));
-            }
-
-            items.add(item);
-        }
     }
 }

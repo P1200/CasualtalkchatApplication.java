@@ -6,6 +6,8 @@ import com.project.casualtalkchat.common.FileCouldNotBeSavedException;
 import com.vaadin.flow.server.InputStreamFactory;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,8 +55,8 @@ public class ConversationService {
     }
 
     @Transactional
-    public List<MessageEntity> getMessagesList(String conversationId) {
-        return messageRepository.getAllByConversationIdOrderBySentTime(conversationId);
+    public Page<MessageEntity> getMessagesList(PageRequest pageRequest, String conversationId) {
+        return messageRepository.getAllByConversationIdOrderBySentTimeDesc(pageRequest, conversationId);
     }
 
     @Transactional

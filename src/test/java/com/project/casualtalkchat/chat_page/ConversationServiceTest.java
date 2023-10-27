@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -92,16 +94,19 @@ class ConversationServiceTest {
                 new ConversationService(repository, attachmentRepository, messageRepository, userRepository, resourcesRepository);
         UserEntity userEntity = prepareUserEntity(USER_ID, USERNAME, EMAIL);
         UserEntity adminUserEntity = prepareUserEntity(ADMIN_ID, ADMIN_USERNAME, ADMIN_EMAIL);
+        PageRequest pageRequest = PageRequest.of(0, 10);
         List<MessageEntity> messageEntities =
                 List.of(prepareMessageEntity(userEntity, Timestamp.from(FIRST_MESSAGE_SENT_TIME), FIRST_MESSAGE_TEXT),
                         prepareMessageEntity(adminUserEntity, Timestamp.from(SECOND_MESSAGE_SENT_TIME), SECOND_MESSAGE_TEXT));
-        when(messageRepository.getAllByConversationIdOrderBySentTime(CONVERSATION_ID)).thenReturn(messageEntities);
+        PageImpl<MessageEntity> messageEntityPage = new PageImpl<>(messageEntities, pageRequest, 0);
+        when(messageRepository.getAllByConversationIdOrderBySentTimeDesc(pageRequest, CONVERSATION_ID)).thenReturn(messageEntityPage);
 
         //When
-        List<MessageEntity> messages = service.getMessagesList(CONVERSATION_ID);
+        List<MessageEntity> messages = service.getMessagesList(pageRequest, CONVERSATION_ID)
+                                                .toList();
 
         //Then
-        assertEquals(messageEntities, messages);
+        assertEquals(messageEntities.toString(), messages.toString());
     }
 
     @Test
@@ -110,13 +115,18 @@ class ConversationServiceTest {
         ConversationService service =
                 new ConversationService(repository, attachmentRepository, messageRepository, userRepository, resourcesRepository);
         List<MessageEntity> messageEntities = Collections.emptyList();
-        when(messageRepository.getAllByConversationIdOrderBySentTime(CONVERSATION_ID)).thenReturn(messageEntities);
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        PageImpl<MessageEntity> messageEntityPage = new PageImpl<>(messageEntities, pageRequest, 0);
+        when(messageRepository.getAllByConversationIdOrderBySentTimeDesc(pageRequest, CONVERSATION_ID))
+                .thenReturn(messageEntityPage);
 
         //When
-        List<MessageEntity> messages = service.getMessagesList(CONVERSATION_ID);
+        List<MessageEntity> messages = service.getMessagesList(pageRequest, CONVERSATION_ID)
+                                                .toList();
 
         //Then
-        assertEquals(Collections.emptyList(), messages);
+        assertEquals(Collections.emptyList()
+                                .toString(), messages.toString());
     }
 
     @Test
