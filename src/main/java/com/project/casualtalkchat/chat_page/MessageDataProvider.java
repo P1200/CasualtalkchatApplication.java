@@ -5,7 +5,6 @@ import com.vaadin.flow.component.Component;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -23,7 +22,7 @@ public class MessageDataProvider implements DataProvider {
 
         List<Component> messageListItems = new ArrayList<>();
         Page<MessageEntity> messageEntityPage =
-                service.getMessagesList(PageRequest.of(pageNumber, pageSize, Sort.Direction.ASC, "sentTime"), conversationId);
+                service.getMessagesList(PageRequest.of(pageNumber, pageSize), conversationId);
 
         for (MessageEntity message : messageEntityPage) {
             Instant messageSentTime = message.getSentTime()

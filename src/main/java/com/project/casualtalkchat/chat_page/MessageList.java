@@ -13,6 +13,7 @@ public class MessageList extends Scroller {
     public final Div div = new Div();
     private DataProvider dataProvider;
     private int pageNumber = 0;
+    private int pagesToBottom = 0;
 
     public MessageList(DataProvider dataProvider) {
         this.dataProvider = dataProvider;
@@ -32,6 +33,10 @@ public class MessageList extends Scroller {
             this.addEventListener("scroll", function(e) {
                 if(self.scrollTop + self.clientHeight >= self.scrollHeight - 1) {
                     self.$server.loadMoreRows();
+                }
+                
+                if(self.scrollTop == 0) {
+                    self.$server.loadMoreRowsAtBottom();
                 }
             });
                 """);
@@ -72,17 +77,40 @@ public class MessageList extends Scroller {
 
     public void setItems(List<MessageListItem> items) {
         this.div.removeAll();
-        items.forEach(div::add);
+        items.forEach(div::addComponentAsFirst);
     }
 
     public void addItems(List<MessageListItem> items) {
         items.forEach(div::add);
     }
 
+    public void setPageNumber(int pageNumber) {
+        this.pageNumber = pageNumber;
+    }
+
     @ClientCallable
     public void loadMoreRows() {
         List<Component> messages =  dataProvider.fetchPage(pageNumber ++);
         messages.forEach(div::addComponentAsFirst);
+    }
+
+    @ClientCallable
+    public void loadMoreRowsAtBottom() {
+
+        if (pagesToBottom != 0) {
+            List<Component> messages =  dataProvider.fetchPage(-- pagesToBottom);
+            for (int i = messages.size() - 1; i >= 0; i --) {
+                div.add(messages.get(i));
+            }
+        }
+    }
+
+    public void enableLoadMoreRowsAtBottom() {
+        pagesToBottom = pageNumber - 1;
+    }
+
+    public void disableLoadMoreRowsAtBottom() {
+        pagesToBottom = 0;
     }
 
     public void reload() {

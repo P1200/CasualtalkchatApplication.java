@@ -111,6 +111,25 @@ public class ConversationService {
         return attachments;
     }
 
+    public List<MessageEntity> getMessagesWithPattern(String conversationId, String pattern) {
+        String wildcardPattern = "%" + pattern + "%";
+        return messageRepository.getAllByConversationIdAndContentLikeOrderBySentTimeDesc(conversationId, wildcardPattern);
+    }
+
+    @Transactional
+    public Page<MessageEntity> getMessagesPageWithSpecificRow(int pageSize, String conversationId, String specificRowId) {
+
+        int position = messageRepository.getMessagePositionInConversationById(conversationId, specificRowId);
+        int pageNumber = 0;
+
+        for (int i = pageSize; i < position; i*=2) {
+            pageNumber ++;
+        }
+
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
+        return messageRepository.getAllByConversationIdOrderBySentTimeDesc(pageRequest, conversationId);
+    }
+
     private List<AttachmentEntity> prepareAttachmentEntities(String conversationId, List<Attachment> attachments)
             throws FileCouldNotBeSavedException {
         List<AttachmentEntity> attachmentEntities = new ArrayList<>();
