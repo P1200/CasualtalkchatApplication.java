@@ -6,6 +6,8 @@ import com.project.casualtalkchat.common.FileCouldNotBeSavedException;
 import com.vaadin.flow.server.InputStreamFactory;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,8 +55,8 @@ public class ConversationService {
     }
 
     @Transactional
-    public List<MessageEntity> getMessagesList(String conversationId) {
-        return messageRepository.getAllByConversationIdOrderBySentTime(conversationId);
+    public Page<MessageEntity> getMessagesList(PageRequest pageRequest, String conversationId) {
+        return messageRepository.getAllByConversationIdOrderBySentTimeDesc(pageRequest, conversationId);
     }
 
     @Transactional
@@ -107,6 +109,25 @@ public class ConversationService {
             }
         }
         return attachments;
+    }
+
+    public List<MessageEntity> getMessagesWithPattern(String conversationId, String pattern) {
+        String wildcardPattern = "%" + pattern + "%";
+        return messageRepository.getAllByConversationIdAndContentLikeOrderBySentTimeDesc(conversationId, wildcardPattern);
+    }
+
+    @Transactional
+    public Page<MessageEntity> getMessagesPageWithSpecificRow(int pageSize, String conversationId, String specificRowId) {
+
+        int position = messageRepository.getMessagePositionInConversationById(conversationId, specificRowId);
+        int pageNumber = 0;
+
+        for (int i = pageSize; i < position; i*=2) {
+            pageNumber ++;
+        }
+
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
+        return messageRepository.getAllByConversationIdOrderBySentTimeDesc(pageRequest, conversationId);
     }
 
     private List<AttachmentEntity> prepareAttachmentEntities(String conversationId, List<Attachment> attachments)
