@@ -16,6 +16,7 @@ public class MessageDataProvider implements DataProvider {
     private final ConversationService service;
     private final int pageSize;
     private final String conversationId;
+    private final String loggedInUserId;
 
     @Override
     public List<Component> fetchPage(int pageNumber) {
@@ -42,8 +43,19 @@ public class MessageDataProvider implements DataProvider {
                         messageSentTime, senderUsername, UserEntityUtils.getAvatarResource(message.getSender()
                         .getAvatarName()));
             }
+
+            if (isNotViewedByUser(message)) {
+                item.getStyle()
+                    .setBackground("lightcyan");
+                item.addAttachListener(event -> service.markMessageAsViewedBy(message.getId(), loggedInUserId));
+            }
+
             messageListItems.add(item);
         }
         return messageListItems;
+    }
+
+    private boolean isNotViewedByUser(MessageEntity message) {
+        return message.getMembersWhoNotViewed().stream().anyMatch(member -> loggedInUserId.equals(member.getId()));
     }
 }

@@ -12,6 +12,7 @@ import java.util.Set;
 @Setter
 @Builder
 @ToString
+@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "ChatUserEntity")
@@ -33,9 +34,11 @@ class UserEntity {
 
     @ManyToMany
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<UserEntity> friends;
 
     @ManyToMany
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<UserEntity> invitations;
 }
