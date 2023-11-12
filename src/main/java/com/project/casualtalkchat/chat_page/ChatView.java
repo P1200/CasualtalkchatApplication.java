@@ -20,7 +20,9 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MultiFileBuffer;
 import com.vaadin.flow.dom.Style;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.shared.Registration;
 import jakarta.annotation.security.PermitAll;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -33,6 +35,7 @@ import java.util.*;
 @PermitAll
 @Slf4j
 @CssImport("./styles.css")
+@PageTitle("CasualTalk")
 public class ChatView extends VerticalLayout {
 
     public static final int CHAT_PAGE_SIZE = 15;
@@ -47,12 +50,12 @@ public class ChatView extends VerticalLayout {
     private List<MessageEntity> messagesWithPattern;
     private int currentMessageWithPatternIndex = 0;
     private String searchedKeyword;
+    private Registration broadcasterRegistration;
 
     public ChatView(SecurityService securityService, UserService userService, ConversationService conversationService) {
 
         this.service = userService;
         this.conversationService = conversationService;
-        this.messageList = new MessageList(new MessageDataProvider(conversationService, 15, currentConversationId));
 
         ComponentUtil.setData(UI.getCurrent(), ChatView.class, this);
 
@@ -63,6 +66,10 @@ public class ChatView extends VerticalLayout {
             throw new RuntimeException(); //TODO redirect to error page
         }
 
+        MessageDataProvider messageDataProvider =
+                new MessageDataProvider(conversationService, 15, currentConversationId, loggedInUserDetails.getId());
+        this.messageList = new MessageList(messageDataProvider);
+
         add(new TopBar(securityService), getPageLayout(loggedInUserDetails));
     }
 
@@ -70,8 +77,48 @@ public class ChatView extends VerticalLayout {
 
         this.currentConversationId = currentConversationId;
         log.debug("Chat was changed");
-        messageList.setDataProvider(new MessageDataProvider(conversationService, CHAT_PAGE_SIZE, currentConversationId));
+        messageList.setDataProvider(new MessageDataProvider(conversationService, CHAT_PAGE_SIZE, currentConversationId, loggedInUserDetails.getId()));
         messageList.reload();
+    }
+
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+        UI ui = attachEvent.getUI();
+        broadcasterRegistration = Broadcaster.register((newMessageDTO, conversationId) -> {
+            if (conversationId.equals(currentConversationId)) {
+
+                ui.access(() -> {
+
+                    MessageListItem newMessage;
+                    if (isContainingAttachments(newMessageDTO)) {
+                        newMessage = new MessageListItem(newMessageDTO.getAttachments(),
+                                newMessageDTO.getContent(), newMessageDTO.getSentTime(), newMessageDTO.getUserName(),
+                                newMessageDTO.getUserAvatarResource());
+                    } else {
+                        newMessage = new MessageListItem(
+                                newMessageDTO.getContent(), newMessageDTO.getSentTime(), newMessageDTO.getUserName(),
+                                newMessageDTO.getUserAvatarResource());
+                    }
+
+                    if (!loggedInUserDetails.getId().equals(newMessageDTO.getSenderId())) {
+                        newMessage.getStyle()
+                                .setBackground("lightcyan");
+                    }
+
+                    messageList.addItems(List.of(newMessage));
+                });
+            }
+        });
+    }
+
+    @Override
+    protected void onDetach(DetachEvent detachEvent) {
+        broadcasterRegistration.remove();
+        broadcasterRegistration = null;
+    }
+
+    private boolean isContainingAttachments(MessageDTO newMessageDTO) {
+        return newMessageDTO.getAttachments() != null;
     }
 
     private HorizontalLayout getPageLayout(CustomUserDetails userDetails) {
@@ -111,12 +158,15 @@ public class ChatView extends VerticalLayout {
 
         input.addSubmitListener(submitEvent -> {
 
-            List<MessageListItem> items = new ArrayList<>();
+            MessageDTO messageDTO;
             if (buffer.getFiles().isEmpty()) {
-                MessageListItem newMessage = new MessageListItem(
-                        submitEvent.getValue(), Instant.now(), userDetails.getUsername(),
-                        UserEntityUtils.getAvatarResource(userDetails));
-                items.add(newMessage);
+                messageDTO = MessageDTO.builder()
+                        .content(submitEvent.getValue())
+                        .sentTime(Instant.now())
+                        .userName(userDetails.getUsername())
+                        .userAvatarResource(UserEntityUtils.getAvatarResource(userDetails))
+                        .senderId(userDetails.getId())
+                        .build();
                 conversationService.saveMessage(currentConversationId, userDetails.getId(), submitEvent.getValue(), Instant.now());
             } else {
                 upload.clearFileList();
@@ -132,13 +182,17 @@ public class ChatView extends VerticalLayout {
                 }
                 List<Attachment> attachmentResources =
                         conversationService.getMessageAttachmentResources(messageEntity.getAttachments());
-                MessageListItem newMessage = new MessageListItem(attachmentResources,
-                        submitEvent.getValue(), Instant.now(), userDetails.getUsername(),
-                        UserEntityUtils.getAvatarResource(userDetails));
-                items.add(newMessage);
-            }
 
-            messageList.addItems(items);
+                messageDTO = MessageDTO.builder()
+                        .content(submitEvent.getValue())
+                        .sentTime(Instant.now())
+                        .userName(userDetails.getUsername())
+                        .userAvatarResource(UserEntityUtils.getAvatarResource(userDetails))
+                        .attachments(attachmentResources)
+                        .senderId(userDetails.getId())
+                        .build();
+            }
+            Broadcaster.broadcast(messageDTO, currentConversationId);
         });
         return input;
     }
@@ -202,7 +256,8 @@ public class ChatView extends VerticalLayout {
             searchThroughHistoryButton.getStyle().setDisplay(Style.Display.FLEX);
             searchBar.getStyle().setDisplay(Style.Display.NONE);
             messageList.disableLoadMoreRowsAtBottom();
-            messageList.setDataProvider(new MessageDataProvider(conversationService, CHAT_PAGE_SIZE, currentConversationId));
+            messageList.setDataProvider(new MessageDataProvider(conversationService, CHAT_PAGE_SIZE,
+                    currentConversationId, loggedInUserDetails.getId()));
             messageList.reload();
         });
 

@@ -1,9 +1,6 @@
 package com.project.casualtalkchat.chat_page;
 
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.ComponentUtil;
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.Unit;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.avatar.AvatarGroup;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -24,9 +21,11 @@ import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.function.ValueProvider;
+import com.vaadin.flow.server.InputStreamFactory;
+import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.shared.Registration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
-import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.Objects;
 
@@ -46,7 +45,10 @@ public class TabsSectionComponent extends Div {
     private final String userId;
     private final TabSheet tabSheet;
     private final Tab chats;
+    private final Audio messageSoundComponent;
+    private final ConversationDataProvider conversationDataProvider;
     private Grid<ConversationEntity> conversationsGrid;
+    private Registration broadcasterRegistration;
 
     public TabsSectionComponent(UserService userService, ConversationService conversationService, String userId) {
 
@@ -62,7 +64,7 @@ public class TabsSectionComponent extends Div {
         FriendDataProvider friendDataProvider = new FriendDataProvider(userService, userId);
         this.friendFilterDataProvider = friendDataProvider.withConfigurableFilter();
 
-        ConversationDataProvider conversationDataProvider = new ConversationDataProvider(conversationService, userId);
+        conversationDataProvider = new ConversationDataProvider(conversationService, userId);
         this.conversationFilterDataProvider = conversationDataProvider.withConfigurableFilter();
 
         tabSheet = new TabSheet();
@@ -84,7 +86,33 @@ public class TabsSectionComponent extends Div {
 
         tabSheet.setHeight(100, Unit.PERCENTAGE);
 
-        add(createAddNewFriendDialog, tabSheet);
+        messageSoundComponent = getMessageSoundComponent();
+
+        add(createAddNewFriendDialog, tabSheet, messageSoundComponent);
+    }
+
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+        UI ui = attachEvent.getUI();
+        broadcasterRegistration = Broadcaster.register((newMessage, conversationId) -> ui.access(() -> {
+            if (isDataGridContainingChatWithGivenId(conversationId) && !userId.equals(newMessage.getSenderId())) {
+                messageSoundComponent.getElement()
+                        .executeJs("this.play();");
+                conversationDataProvider.refreshAll();
+            }
+        }));
+    }
+
+    @Override
+    protected void onDetach(DetachEvent detachEvent) {
+        broadcasterRegistration.remove();
+        broadcasterRegistration = null;
+    }
+
+    private boolean isDataGridContainingChatWithGivenId(String conversationId) {
+        return conversationDataProvider.getConversations()
+                .stream()
+                .anyMatch(conversationEntity -> conversationEntity.getId().equals(conversationId));
     }
 
     private Div getContent(Component tabContent, Button button) {
@@ -221,8 +249,13 @@ public class TabsSectionComponent extends Div {
 
         conversationsGrid.addItemClickListener(conversation -> {
             log.debug("Chat has been changed.");
+            String currentConversationId = conversation.getItem()
+                                                        .getId();
             ComponentUtil.getData(UI.getCurrent(), ChatView.class)
-                        .changeChat(conversation.getItem().getId());
+                        .changeChat(currentConversationId);
+            conversationService.markConversationAsViewedBy(currentConversationId, userId);
+            conversationDataProvider.refreshAll();
+            conversationsGrid.select(conversation.getItem());
         });
 
         return getLayoutForChats(conversationsGrid, conversationFilterDataProvider);
@@ -270,7 +303,21 @@ public class TabsSectionComponent extends Div {
         grid.addComponentColumn(getConversationMiniature());
 
         grid.addColumn(ConversationEntity::getName, "name");
+
+        grid.setPartNameGenerator(conversation -> {
+            if (isConversationNotViewed(conversation)) {
+                return "has-new-message";
+            } else {
+                return null;
+            }
+        });
         return grid;
+    }
+
+    private boolean isConversationNotViewed(ConversationEntity conversation) {
+        return conversation.getMembersWhoNotViewed()
+                            .stream()
+                            .anyMatch(member -> userId.equals(member.getId()));
     }
 
     private ValueProvider<ConversationEntity, AvatarGroup> getConversationMiniature() {
@@ -303,5 +350,15 @@ public class TabsSectionComponent extends Div {
         });
         grid.addColumn(UserEntity::getUsername, "username");
         return grid;
+    }
+
+    private Audio getMessageSoundComponent() {
+        InputStreamFactory resource =
+                () -> getClass().getResourceAsStream("/sounds/incoming_message.mp3");
+        Audio messageSound = new Audio(new StreamResource("message_sound", resource));
+        messageSound.setSizeUndefined();
+        messageSound.getStyle().setDisplay(Style.Display.NONE);
+        add(messageSound);
+        return messageSound;
     }
 }

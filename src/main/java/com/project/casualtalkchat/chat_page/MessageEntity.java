@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -34,4 +35,7 @@ public class MessageEntity {
     @ManyToOne
     @ToString.Exclude
     private UserEntity sender;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<UserEntity> membersWhoNotViewed;
 }

@@ -45,7 +45,7 @@ public class ConversationService {
     }
 
     public List<ConversationEntity> getUserConversations(String userId) {
-        return repository.getAllByAdminsIdOrMembersId(userId, userId);
+        return repository.getAllByAdminsIdOrMembersIdSortedByLastMessageSentTime(userId, userId);
     }
 
     @Transactional
@@ -64,12 +64,16 @@ public class ConversationService {
         ConversationEntity conversation = repository.getReferenceById(conversationId);
 
         UserEntity sender = userRepository.getReferenceById(senderId);
+        Set<UserEntity> membersWhoNotViewed = new HashSet<>(conversation.getMembers());
+        membersWhoNotViewed.remove(sender);
+        conversation.setMembersWhoNotViewed(membersWhoNotViewed);
 
         MessageEntity message = MessageEntity.builder()
                                             .sender(sender)
                                             .sentTime(Timestamp.from(time))
                                             .content(text)
                                             .conversation(conversation)
+                                            .membersWhoNotViewed(membersWhoNotViewed)
                                             .build();
 
         messageRepository.save(message);
@@ -81,6 +85,9 @@ public class ConversationService {
         ConversationEntity conversation = repository.getReferenceById(conversationId);
 
         UserEntity sender = userRepository.getReferenceById(senderId);
+        Set<UserEntity> membersWhoNotViewed = new HashSet<>(conversation.getMembers());
+        membersWhoNotViewed.remove(sender);
+        conversation.setMembersWhoNotViewed(membersWhoNotViewed);
 
         List<AttachmentEntity> attachmentEntities = prepareAttachmentEntities(conversationId, attachments);
         attachmentRepository.saveAll(attachmentEntities);
@@ -90,6 +97,7 @@ public class ConversationService {
                 .content(text)
                 .conversation(conversation)
                 .attachments(attachmentEntities)
+                .membersWhoNotViewed(membersWhoNotViewed)
                 .build();
 
         messageRepository.save(message);
@@ -128,6 +136,20 @@ public class ConversationService {
 
         PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
         return messageRepository.getAllByConversationIdOrderBySentTimeDesc(pageRequest, conversationId);
+    }
+
+    @Transactional
+    public void markConversationAsViewedBy(String currentConversationId, String userId) {
+        ConversationEntity conversationEntity = repository.getReferenceById(currentConversationId);
+        conversationEntity.getMembersWhoNotViewed()
+                            .removeIf(member -> userId.equals(member.getId()));
+    }
+
+    @Transactional
+    public void markMessageAsViewedBy(String conversationId, String userId) {
+        MessageEntity messageEntity = messageRepository.getReferenceById(conversationId);
+        messageEntity.getMembersWhoNotViewed()
+                    .removeIf(member -> userId.equals(member.getId()));
     }
 
     private List<AttachmentEntity> prepareAttachmentEntities(String conversationId, List<Attachment> attachments)

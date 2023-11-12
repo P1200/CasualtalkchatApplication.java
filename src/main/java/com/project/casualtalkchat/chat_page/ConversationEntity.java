@@ -8,6 +8,7 @@ import java.util.Set;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,8 +24,12 @@ public class ConversationEntity {
 
     @ManyToMany
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<UserEntity> admins;
 
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<UserEntity> members;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<UserEntity> membersWhoNotViewed;
 }

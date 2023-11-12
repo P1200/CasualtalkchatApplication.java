@@ -2,6 +2,7 @@ package com.project.casualtalkchat.chat_page;
 
 import com.vaadin.flow.data.provider.AbstractBackEndDataProvider;
 import com.vaadin.flow.data.provider.Query;
+import lombok.Getter;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -10,6 +11,7 @@ public class ConversationDataProvider extends AbstractBackEndDataProvider<Conver
 
     private final ConversationService service;
     private final String userId;
+    @Getter
     private List<ConversationEntity> conversations;
 
     public ConversationDataProvider(ConversationService service, String currentUserId) {

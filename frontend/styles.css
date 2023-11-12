@@ -248,4 +248,8 @@ vaadin-upload-file-list {
 vaadin-upload::part(drop-label) {
   display: none;
 }
+
+vaadin-grid::part(has-new-message) {
+  font-weight: bold;
+}
 /*Grid end*/
