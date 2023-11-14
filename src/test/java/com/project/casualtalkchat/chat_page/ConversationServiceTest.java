@@ -64,7 +64,7 @@ class ConversationServiceTest {
         ConversationService service =
                 new ConversationService(repository, attachmentRepository, messageRepository, userRepository, resourcesRepository);
         List<ConversationEntity> conversationEntities = prepareConversations();
-        when(repository.getAllByAdminsIdOrMembersIdSortedByLastMessageSentTime(anyString(), anyString())).thenReturn(conversationEntities);
+        when(repository.getAllByAdminsIdOrMembersIdSortedByLastMessageSentTime(anyString())).thenReturn(conversationEntities);
 
         //When
         List<ConversationEntity> userConversations = service.getUserConversations(USER_ID);

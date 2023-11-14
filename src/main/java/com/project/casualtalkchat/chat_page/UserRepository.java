@@ -20,13 +20,23 @@ public interface UserRepository extends JpaRepository<UserEntity, String> {
 
     List<UserEntity> findAllByInvitationsId(String id);
 
-    @Query(value = """
-            SELECT * FROM `user` u
-            LEFT JOIN user_friends f ON u.id=f.chat_user_entity_id
-            WHERE f.friends_id=:user_id OR
-             u.id IN (SELECT f.friends_id FROM `user` u
-            LEFT JOIN user_friends f ON u.id=f.chat_user_entity_id WHERE u.id=:user_id)""", nativeQuery = true)
-    List<UserEntity> findAllFriends(@Param("user_id") String id);
+    @Query("""
+        SELECT u FROM ChatUserEntity u LEFT JOIN u.friends f WHERE f.id = :userId OR u IN (
+            SELECT f FROM ChatUserEntity u LEFT JOIN u.friends f WHERE u.id = :userId
+        )
+    """)
+    List<UserEntity> findAllFriends(String userId);
+
+    @Query("""
+        SELECT u FROM ChatUserEntity u LEFT JOIN u.friends f WHERE (f.id = :userId OR u IN (
+            SELECT f FROM ChatUserEntity u LEFT JOIN u.friends f WHERE u.id = :userId
+        )) AND u NOT IN (
+            SELECT c.admins FROM ChatConversationEntity c WHERE c.id = :conversationId
+        ) AND u NOT IN (
+            SELECT c.members FROM ChatConversationEntity c WHERE c.id = :conversationId
+        )
+    """)
+    List<UserEntity> findAllFriendsNotParticipatingInChat(String userId, String conversationId);
 
     @Modifying
     @Query(value = """
@@ -34,4 +44,10 @@ public interface UserRepository extends JpaRepository<UserEntity, String> {
             (`chat_user_entity_id`=:user_id AND friends_id=:friend_id) OR
             (`friends_id`=:user_id AND chat_user_entity_id=:friend_id)""", nativeQuery = true)
     void removeFriend(@Param("user_id") String userId, @Param("friend_id") String friendId);
+
+    @Query(value = "SELECT a FROM ChatConversationEntity c LEFT JOIN c.admins a WHERE c.id = :conversationId")
+    List<UserEntity> findAllConversationAdmins(String conversationId);
+
+    @Query(value = "SELECT m FROM ChatConversationEntity c LEFT JOIN c.members m WHERE c.id = :conversationId")
+    List<UserEntity> findAllConversationMembers(String conversationId);
 }

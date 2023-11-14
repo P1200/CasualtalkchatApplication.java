@@ -45,7 +45,7 @@ public class ConversationService {
     }
 
     public List<ConversationEntity> getUserConversations(String userId) {
-        return repository.getAllByAdminsIdOrMembersIdSortedByLastMessageSentTime(userId, userId);
+        return repository.getAllByAdminsIdOrMembersIdSortedByLastMessageSentTime(userId);
     }
 
     @Transactional
@@ -150,6 +150,26 @@ public class ConversationService {
         MessageEntity messageEntity = messageRepository.getReferenceById(conversationId);
         messageEntity.getMembersWhoNotViewed()
                     .removeIf(member -> userId.equals(member.getId()));
+    }
+
+    @Transactional
+    public void addUserToConversation(String conversationId, String userId) {
+        ConversationEntity conversationEntity = repository.getReferenceById(conversationId);
+        UserEntity userEntity = userRepository.getReferenceById(userId);
+        conversationEntity.getMembers()
+                          .add(userEntity);
+    }
+
+    public boolean isConversationAdmin(String conversationId, String userId) {
+        return repository.isConversationAdmin(conversationId, userId);
+    }
+
+    @Transactional
+    public void removeFromConversation(String conversationId, String userId) {
+        ConversationEntity conversationEntity = repository.getReferenceById(conversationId);
+        UserEntity member = userRepository.getReferenceById(userId);
+        conversationEntity.getMembers()
+                            .remove(member);
     }
 
     private List<AttachmentEntity> prepareAttachmentEntities(String conversationId, List<Attachment> attachments)

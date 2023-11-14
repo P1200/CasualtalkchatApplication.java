@@ -52,6 +52,10 @@ public class UserService {
         return userRepository.findAllFriends(userId);
     }
 
+    public List<UserEntity> getAllFriendsNotParticipatingInChat(String userId, String conversationId) {
+        return userRepository.findAllFriendsNotParticipatingInChat(userId, conversationId);
+    }
+
     @Transactional
     public void removeFriend(String userId, UserEntity friendEntity) {
 
@@ -80,5 +84,13 @@ public class UserService {
                 });
 
         userRepository.save(inviterInSession);
+    }
+
+    public List<UserEntity> getAllAdminsInChat(String conversationId) {
+        return userRepository.findAllConversationAdmins(conversationId);
+    }
+
+    public List<UserEntity> getAllMembersInChat(String conversationId) {
+        return userRepository.findAllConversationMembers(conversationId);
     }
 }
