@@ -1,6 +1,6 @@
 package com.project.casualtalkchat.chat_page;
 
-public class ConversationFilter {
+public class ConversationFilter implements Filter<ConversationEntity>{
     private String searchTerm;
 
     public void setSearchTerm(String searchTerm) {

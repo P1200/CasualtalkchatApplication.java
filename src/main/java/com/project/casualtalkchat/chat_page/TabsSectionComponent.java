@@ -3,22 +3,17 @@ package com.project.casualtalkchat.chat_page;
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.avatar.AvatarGroup;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.TabSheet;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
-import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.server.InputStreamFactory;
@@ -34,7 +29,7 @@ import static com.project.casualtalkchat.common.UserEntityUtils.getAvatarResourc
 @Slf4j
 public class TabsSectionComponent extends Div {
 
-    private final UserFilter personFilter = new UserFilter();
+    private final UserFilter userFilter = new UserFilter();
     private final ConversationFilter chatsFilter = new ConversationFilter();
     private final ConfigurableFilterDataProvider<UserEntity, Void, UserFilter> userFilterDataProvider;
     private final ConfigurableFilterDataProvider<UserEntity, Void, UserFilter> invitationFilterDataProvider;
@@ -76,19 +71,20 @@ public class TabsSectionComponent extends Div {
 
         Tab friends = new Tab(VaadinIcon.USERS.create(), new Span("Friends"));
         Button addNewFriend = new Button("Add new friend");
-        Dialog createAddNewFriendDialog = getAddNewFriendDialog();
-        addNewFriend.addClickListener(event -> createAddNewFriendDialog.open());
+        Dialog addNewFriendDialog = getAddNewFriendDialog();
+        addNewFriend.addClickListener(event -> addNewFriendDialog.open());
         tabSheet.add(friends, getContent(getFriendsDataGrid(), addNewFriend));
 
         Tab invitations = new Tab(VaadinIcon.ENVELOPES.create(), new Span("Invitations"));
         Button addNewFriendButtonInInvitations = new Button("Add new friend");
+        addNewFriendButtonInInvitations.addClickListener(event -> addNewFriendDialog.open());
         tabSheet.add(invitations, getContent(getInvitationsDataGrid(), addNewFriendButtonInInvitations));
 
         tabSheet.setHeight(100, Unit.PERCENTAGE);
 
         messageSoundComponent = getMessageSoundComponent();
 
-        add(createAddNewFriendDialog, tabSheet, messageSoundComponent);
+        add(addNewFriendDialog, tabSheet, messageSoundComponent);
     }
 
     @Override
@@ -116,12 +112,10 @@ public class TabsSectionComponent extends Div {
     }
 
     private Div getContent(Component tabContent, Button button) {
-        Scroller chatsScroller = new Scroller(tabContent);
-
         button.getStyle()
                 .setPosition(Style.Position.ABSOLUTE)
                 .setBottom("0");
-        Div content = new Div(chatsScroller, button);
+        Div content = new Div(tabContent, button);
         content.getStyle()
                 .setPosition(Style.Position.RELATIVE)
                 .setHeight("100%");
@@ -129,31 +123,19 @@ public class TabsSectionComponent extends Div {
     }
 
     private Dialog getAddNewFriendDialog() {
-        Dialog dialog = new Dialog();
+        Dialog dialog = new ManagementDialog();
 
         dialog.setHeaderTitle("Add new friend");
 
         VerticalLayout dialogLayout = getUserDataGrid();
         dialog.add(dialogLayout);
 
-        Button closeButton = new Button("Close", e -> dialog.close());
-        dialog.getFooter().add(closeButton);
-
-        Button closeCrossButton = new Button(new Icon("lumo", "cross"),
-                e -> dialog.close());
-        closeCrossButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-        dialog.getHeader().add(closeCrossButton);
-
-        dialog.setModal(false);
-        dialog.setDraggable(true);
-        dialog.setWidth(50, Unit.VW);
-
         return dialog;
     }
 
     private VerticalLayout getUserDataGrid() {
 
-        Grid<UserEntity> grid = getUserEntityGrid();
+        Grid<UserEntity> grid = new UserGrid();
         grid.addColumn(UserEntity::getId, "userId");
         grid.addComponentColumn(userEntity -> {
             Button inviteButton = new Button("Invite");
@@ -164,12 +146,33 @@ public class TabsSectionComponent extends Div {
             });
             return  inviteButton;
         });
-        return getLayout(grid, userFilterDataProvider);
+        return new GridFilterableWrapper(grid, userFilterDataProvider, userFilter);
+    }
+
+    private VerticalLayout getFriendsToAddDataGrid(String conversationId) {
+
+        Grid<UserEntity> grid = new UserGrid();
+        grid.addColumn(UserEntity::getId, "userId");
+        grid.addComponentColumn(userEntity -> {
+            Button addButton = new Button("Add");
+            addButton.setDisableOnClick(true);
+            addButton.addClickListener(event -> {
+                conversationService.addUserToConversation(conversationId, userEntity.getId());
+                addButton.setText("Added");
+                conversationDataProvider.refreshAll();
+            });
+            return  addButton;
+        });
+        FriendNotParticipatingInChatDataProvider friendNotParticipatingDataProvider =
+                new FriendNotParticipatingInChatDataProvider(userService, userId, conversationId);
+        ConfigurableFilterDataProvider<UserEntity, Void, UserFilter> friendNotParticipatingFilterDataProvider =
+                friendNotParticipatingDataProvider.withConfigurableFilter();
+        return new GridFilterableWrapper(grid, friendNotParticipatingFilterDataProvider, userFilter);
     }
 
     private Component getInvitationsDataGrid() {
 
-        Grid<UserEntity> grid = getUserEntityGrid();
+        Grid<UserEntity> grid = new UserGrid();
         grid.addComponentColumn(userEntity -> {
             Button acceptInvitationButton = new Button(VaadinIcon.CHECK_CIRCLE.create());
             acceptInvitationButton.addClickListener(event -> {
@@ -184,12 +187,14 @@ public class TabsSectionComponent extends Div {
             });
             return new Div(acceptInvitationButton, removeInvitationButton);
         });
-        return getLayout(grid, invitationFilterDataProvider);
+        VerticalLayout verticalLayout = new GridFilterableWrapper(grid, invitationFilterDataProvider, userFilter);
+        verticalLayout.setHeight(85, Unit.PERCENTAGE);
+        return verticalLayout;
     }
 
     private Component getFriendsDataGrid() {
 
-        Grid<UserEntity> grid = getUserEntityGrid();
+        Grid<UserEntity> grid = new UserGrid();
         grid.addComponentColumn(userEntity -> {
             Button createNewChatButton = new Button(VaadinIcon.PLUS_CIRCLE.create());
             createNewChatButton.addClickListener(event -> {
@@ -218,7 +223,9 @@ public class TabsSectionComponent extends Div {
             });
             return new Div(createNewChatButton, removeFriendButton);
         });
-        return getLayout(grid, friendFilterDataProvider);
+        VerticalLayout verticalLayout = new GridFilterableWrapper(grid, friendFilterDataProvider, userFilter);
+        verticalLayout.setHeight(85, Unit.PERCENTAGE);
+        return verticalLayout;
     }
 
     private Component getChatsDataGrid() {
@@ -244,7 +251,28 @@ public class TabsSectionComponent extends Div {
                 });
                 confirmation.open();
             });
-            return new Div(removeChatButton);
+
+            Button addMoreFriendsToChatButton = new Button(VaadinIcon.PLUS_CIRCLE.create());
+            addMoreFriendsToChatButton.addClickListener(clickEvent -> {
+                Dialog dialog = new ManagementDialog();
+
+                dialog.setHeaderTitle(conversation.getName() + " chat management");
+
+                Tab admins = new Tab(VaadinIcon.USER_STAR.create(), new Span("Admins"));
+                Tab members = new Tab(VaadinIcon.USERS.create(), new Span("Members"));
+                Tab friends = new Tab(VaadinIcon.PLUS.create(), new Span("Add friend"));
+
+                TabSheet chatManagementTabSheet = new TabSheet();
+
+                chatManagementTabSheet.add(admins, getAdminsTabContent(conversation.getId()));
+                chatManagementTabSheet.add(members, getMembersTabContent(conversation.getId()));
+                chatManagementTabSheet.add(friends, getFriendsToAddDataGrid(conversation.getId()));
+
+                dialog.add(chatManagementTabSheet);
+                dialog.open();
+            });
+
+            return new Div(addMoreFriendsToChatButton, removeChatButton);
         });
 
         conversationsGrid.addItemClickListener(conversation -> {
@@ -258,44 +286,43 @@ public class TabsSectionComponent extends Div {
             conversationsGrid.select(conversation.getItem());
         });
 
-        return getLayoutForChats(conversationsGrid, conversationFilterDataProvider);
-    }
-
-    private VerticalLayout getLayout(Grid grid, ConfigurableFilterDataProvider<UserEntity, Void, UserFilter> filterDataProvider) {
-        grid.setItems(filterDataProvider);
-
-        TextField searchField = new TextField();
-        searchField.setWidth("50%");
-        searchField.setPlaceholder("Search");
-        searchField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
-        searchField.setValueChangeMode(ValueChangeMode.EAGER);
-        searchField.addValueChangeListener(e -> {
-            personFilter.setSearchTerm(e.getValue());
-            filterDataProvider.setFilter(personFilter);
-        });
-
-        VerticalLayout layout = new VerticalLayout(searchField, grid);
-        layout.setPadding(false);
+        VerticalLayout layout = new GridFilterableWrapper(conversationsGrid, conversationFilterDataProvider, chatsFilter);
+        layout.setHeight(85, Unit.PERCENTAGE);
         return layout;
     }
 
-    private VerticalLayout getLayoutForChats(Grid grid,
-                                     ConfigurableFilterDataProvider<ConversationEntity, Void, ConversationFilter> filterDataProvider) {
-        grid.setItems(filterDataProvider);
+    private Component getAdminsTabContent(String conversationId) {
+        Grid<UserEntity> grid = new UserGrid();
+        grid.addColumn(UserEntity::getId, "userId");
+        AdminsInChatDataProvider friendNotParticipatingDataProvider =
+                new AdminsInChatDataProvider(userService, conversationId);
+        ConfigurableFilterDataProvider<UserEntity, Void, UserFilter> adminsFilterDataProvider =
+                friendNotParticipatingDataProvider.withConfigurableFilter();
+        return new GridFilterableWrapper(grid, adminsFilterDataProvider, userFilter);
+    }
 
-        TextField searchField = new TextField();
-        searchField.setWidth("50%");
-        searchField.setPlaceholder("Search");
-        searchField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
-        searchField.setValueChangeMode(ValueChangeMode.EAGER);
-        searchField.addValueChangeListener(e -> {
-            chatsFilter.setSearchTerm(e.getValue());
-            filterDataProvider.setFilter(chatsFilter);
-        });
+    private Component getMembersTabContent(String conversationId) {
+        Grid<UserEntity> grid = new UserGrid();
+        grid.addColumn(UserEntity::getId, "userId");
 
-        VerticalLayout layout = new VerticalLayout(searchField, grid);
-        layout.setPadding(false);
-        return layout;
+        if (conversationService.isConversationAdmin(conversationId, userId)) {
+            grid.addComponentColumn(member -> {
+                Button removeFromChatButton = new Button(VaadinIcon.EXIT.create());
+                removeFromChatButton.addClickListener(event -> {
+                    conversationService.removeFromConversation(conversationId, member.getId());
+                    grid.getDataProvider()
+                        .refreshAll();
+                    conversationDataProvider.refreshAll();
+                });
+                return removeFromChatButton;
+            });
+        }
+
+        MembersInChatDataProvider friendNotParticipatingDataProvider =
+                new MembersInChatDataProvider(userService, conversationId);
+        ConfigurableFilterDataProvider<UserEntity, Void, UserFilter> adminsFilterDataProvider =
+                friendNotParticipatingDataProvider.withConfigurableFilter();
+        return new GridFilterableWrapper(grid, adminsFilterDataProvider, userFilter);
     }
 
     private Grid<ConversationEntity> getConversationEntityGrid() {
@@ -339,17 +366,6 @@ public class TabsSectionComponent extends Div {
 
     private boolean idsNotEqual(String personId, String userId) {
         return !Objects.equals(personId, userId);
-    }
-
-    private Grid<UserEntity> getUserEntityGrid() {
-        Grid<UserEntity> grid = new Grid<>();
-        grid.addComponentColumn(userEntity -> {
-            Image avatar = new Image(getAvatarResource(userEntity.getAvatarName()), "avatar");
-            avatar.setWidth(50, Unit.PERCENTAGE);
-            return avatar;
-        });
-        grid.addColumn(UserEntity::getUsername, "username");
-        return grid;
     }
 
     private Audio getMessageSoundComponent() {
