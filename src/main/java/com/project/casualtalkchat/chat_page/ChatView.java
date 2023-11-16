@@ -135,6 +135,7 @@ public class ChatView extends VerticalLayout {
 
     private VerticalLayout getChatLayout(CustomUserDetails userDetails) {
         messageList.setWidthFull();
+        messageList.setHeight(100, Unit.PERCENTAGE);
 
         MessageInput input = prepareMessageInput(userDetails);
         prepareUploadComponent(input);
