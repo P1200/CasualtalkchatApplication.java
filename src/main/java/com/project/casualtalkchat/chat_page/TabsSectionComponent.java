@@ -178,6 +178,7 @@ public class TabsSectionComponent extends Div {
             acceptInvitationButton.addClickListener(event -> {
                 userService.acceptInvitation(userId, userEntity);
                 grid.getDataProvider().refreshAll();
+                friendFilterDataProvider.refreshAll();
             });
 
             Button removeInvitationButton = new Button(new Icon("lumo", "cross"));

@@ -23,7 +23,6 @@ import java.util.function.Supplier;
 public class ConversationService {
 
     private static final String PATH_TO_ATTACHMENTS = "attachments/";
-
     private final Supplier<UUID> randomUUID = UUID::randomUUID;
     private final ConversationRepository repository;
     private final AttachmentRepository attachmentRepository;
@@ -31,6 +30,7 @@ public class ConversationService {
     private final UserRepository userRepository;
     private final UserImagesRepository resourcesRepository;
 
+    @Transactional
     public void createNewConversation(String adminId, UserEntity member) {
 
         UserEntity admin = userRepository.getReferenceById(adminId);
