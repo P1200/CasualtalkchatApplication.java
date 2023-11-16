@@ -15,8 +15,11 @@ public interface UserRepository extends JpaRepository<UserEntity, String> {
             SELECT * FROM `user` WHERE
                 id NOT LIKE :user_id AND
                 is_account_confirmed = true AND
-                id NOT IN (SELECT friends_id FROM `user_friends` WHERE `chat_user_entity_id` = :user_id)""", nativeQuery = true)
-    List<UserEntity> findAllNonFriendUsers(@Param("user_id") String id);
+                id NOT IN (SELECT friends_id FROM `user_friends` WHERE `chat_user_entity_id` = :user_id
+                            UNION 
+                            SELECT chat_user_entity_id FROM user_friends WHERE friends_id = :user_id)""",
+            nativeQuery = true)
+    List<UserEntity> findAllNonFriendUsers(@Param("user_id") String userId);
 
     List<UserEntity> findAllByInvitationsId(String id);
 
