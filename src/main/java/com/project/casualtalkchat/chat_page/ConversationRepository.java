@@ -10,13 +10,11 @@ import java.util.List;
 public interface ConversationRepository extends JpaRepository<ConversationEntity, String> {
 
     @Query("""
-    SELECT sortedConversations.conv FROM (
-        SELECT c AS conv, max(m.sentTime) AS lastMessage FROM ChatMessageEntity m LEFT JOIN
+        SELECT c AS conv, max(m.sentTime) AS lastMessage FROM ChatMessageEntity m RIGHT JOIN
         m.conversation c
         LEFT JOIN c.admins a
         LEFT JOIN c.members mbr
-        WHERE a.id = :userId OR mbr.id = :userId GROUP BY m.conversation ORDER BY lastMessage DESC
-    ) AS sortedConversations""")
+        WHERE a.id = :userId OR mbr.id = :userId GROUP BY c.id ORDER BY lastMessage DESC""")
     List<ConversationEntity> getAllByAdminsIdOrMembersIdSortedByLastMessageSentTime(String userId);
 
     @Query("""
