@@ -67,6 +67,7 @@ public class TabsSectionComponent extends Div {
         chats = new Tab(VaadinIcon.CHAT.create(), new Span("Chats"));
         Button addNewChatButton = new Button("Add new chat");
         addNewChatButton.addClickListener(event -> {throw new NotImplementedException();});
+        addNewChatButton.setVisible(false); //TODO
         tabSheet.add(chats, getContent(getChatsDataGrid(), addNewChatButton));
 
         Tab friends = new Tab(VaadinIcon.USERS.create(), new Span("Friends"));
