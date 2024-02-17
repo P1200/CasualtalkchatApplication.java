@@ -44,6 +44,7 @@ public class CustomAuthenticationManager implements AuthenticationManager {
             log.debug("User is disabled.");
             throw new DisabledException("1001");
         }
-        return new UsernamePasswordAuthenticationToken(userDetails, null, List.of(new SimpleGrantedAuthority("USER")));
+        return new UsernamePasswordAuthenticationToken(userDetails, null,
+                List.of(new SimpleGrantedAuthority("USER")));
     }
 }

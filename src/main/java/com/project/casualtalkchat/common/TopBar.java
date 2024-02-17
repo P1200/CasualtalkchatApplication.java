@@ -18,6 +18,8 @@ import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.dom.ElementFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.Optional;
+
 import static com.project.casualtalkchat.common.UserEntityUtils.getAvatarResource;
 
 @JavaScript("https://code.jquery.com/jquery-3.5.1.slim.min.js")
@@ -57,20 +59,14 @@ public class TopBar extends HorizontalLayout {
 
     private Component getAccountManagementLinks() {
 
-        Object principal = SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getPrincipal();
-
-        if (principal instanceof CustomUserDetails userDetails) {
-
-            Div accountManagement = getAccountComponent(userDetails);
+        Optional<CustomUserDetails> authenticatedUser = securityService.getAuthenticatedUser();
+        if (authenticatedUser.isPresent()) {
+            Div accountManagement = getAccountComponent(authenticatedUser.get());
             accountManagement.getStyle()
                     .setCursor("pointer");
 
             return getAccountManagementMenu(accountManagement);
-
         } else {
-
             return getLoginRegisterButtonsList();
         }
     }

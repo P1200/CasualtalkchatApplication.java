@@ -147,7 +147,7 @@ public class TabsSectionComponent extends Div {
             });
             return  inviteButton;
         });
-        return new GridFilterableWrapper(grid, userFilterDataProvider, userFilter);
+        return new GridFilterableWrapper<>(grid, userFilterDataProvider, userFilter);
     }
 
     private VerticalLayout getFriendsToAddDataGrid(String conversationId) {
@@ -168,7 +168,7 @@ public class TabsSectionComponent extends Div {
                 new FriendNotParticipatingInChatDataProvider(userService, userId, conversationId);
         ConfigurableFilterDataProvider<UserEntity, Void, UserFilter> friendNotParticipatingFilterDataProvider =
                 friendNotParticipatingDataProvider.withConfigurableFilter();
-        return new GridFilterableWrapper(grid, friendNotParticipatingFilterDataProvider, userFilter);
+        return new GridFilterableWrapper<>(grid, friendNotParticipatingFilterDataProvider, userFilter);
     }
 
     private Component getInvitationsDataGrid() {
@@ -189,7 +189,7 @@ public class TabsSectionComponent extends Div {
             });
             return new Div(acceptInvitationButton, removeInvitationButton);
         });
-        VerticalLayout verticalLayout = new GridFilterableWrapper(grid, invitationFilterDataProvider, userFilter);
+        VerticalLayout verticalLayout = new GridFilterableWrapper<>(grid, invitationFilterDataProvider, userFilter);
         verticalLayout.setHeight(85, Unit.PERCENTAGE);
         return verticalLayout;
     }
@@ -225,7 +225,7 @@ public class TabsSectionComponent extends Div {
             });
             return new Div(createNewChatButton, removeFriendButton);
         });
-        VerticalLayout verticalLayout = new GridFilterableWrapper(grid, friendFilterDataProvider, userFilter);
+        VerticalLayout verticalLayout = new GridFilterableWrapper<>(grid, friendFilterDataProvider, userFilter);
         verticalLayout.setHeight(85, Unit.PERCENTAGE);
         return verticalLayout;
     }
@@ -288,7 +288,7 @@ public class TabsSectionComponent extends Div {
             conversationsGrid.select(conversation.getItem());
         });
 
-        VerticalLayout layout = new GridFilterableWrapper(conversationsGrid, conversationFilterDataProvider, chatsFilter);
+        VerticalLayout layout = new GridFilterableWrapper<>(conversationsGrid, conversationFilterDataProvider, chatsFilter);
         layout.setHeight(85, Unit.PERCENTAGE);
         return layout;
     }
@@ -300,7 +300,7 @@ public class TabsSectionComponent extends Div {
                 new AdminsInChatDataProvider(userService, conversationId);
         ConfigurableFilterDataProvider<UserEntity, Void, UserFilter> adminsFilterDataProvider =
                 friendNotParticipatingDataProvider.withConfigurableFilter();
-        return new GridFilterableWrapper(grid, adminsFilterDataProvider, userFilter);
+        return new GridFilterableWrapper<>(grid, adminsFilterDataProvider, userFilter);
     }
 
     private Component getMembersTabContent(String conversationId) {
@@ -324,7 +324,7 @@ public class TabsSectionComponent extends Div {
                 new MembersInChatDataProvider(userService, conversationId);
         ConfigurableFilterDataProvider<UserEntity, Void, UserFilter> adminsFilterDataProvider =
                 friendNotParticipatingDataProvider.withConfigurableFilter();
-        return new GridFilterableWrapper(grid, adminsFilterDataProvider, userFilter);
+        return new GridFilterableWrapper<>(grid, adminsFilterDataProvider, userFilter);
     }
 
     private Grid<ConversationEntity> getConversationEntityGrid() {

@@ -9,9 +9,9 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.value.ValueChangeMode;
 
-class GridFilterableWrapper extends VerticalLayout {
+class GridFilterableWrapper<T, E extends Filter<?>> extends VerticalLayout {
 
-    public GridFilterableWrapper(Grid grid, ConfigurableFilterDataProvider filterDataProvider, Filter filter) {
+    public GridFilterableWrapper(Grid<T> grid, ConfigurableFilterDataProvider<T, Void, E> filterDataProvider, E filter) {
         grid.setItems(filterDataProvider);
 
         TextField searchField = new TextField();
