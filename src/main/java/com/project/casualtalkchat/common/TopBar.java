@@ -16,7 +16,6 @@ import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.dom.ElementFactory;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
 

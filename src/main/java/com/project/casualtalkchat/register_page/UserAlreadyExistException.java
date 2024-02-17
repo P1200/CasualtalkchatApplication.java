@@ -1,6 +1,6 @@
 package com.project.casualtalkchat.register_page;
 
-class UserAlreadyExistException extends ServiceException {
+public class UserAlreadyExistException extends ServiceException {
 
     UserAlreadyExistException(String message) {
         super(message);

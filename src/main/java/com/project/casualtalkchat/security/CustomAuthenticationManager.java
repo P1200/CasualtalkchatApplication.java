@@ -32,10 +32,6 @@ public class CustomAuthenticationManager implements AuthenticationManager {
         UserDetails userDetails = userLoginService.loadUserByUsername(email);
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-        if (userDetails == null) {
-            log.debug("User with such email address not found.");
-            throw new BadCredentialsException("1000");
-        }
         if (!passwordEncoder.matches(password, userDetails.getPassword())) {
             log.debug("Password doesn't match.");
             throw new BadCredentialsException("1000");

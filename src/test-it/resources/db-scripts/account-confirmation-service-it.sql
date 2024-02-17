@@ -1,0 +1,2 @@
+INSERT INTO `user` (id, username, email, password, is_account_confirmed, is_service_terms_accepted) VALUES ('a2c43ade-742e-40d6-b0b3-a933c29a9d7d', 'Paul', 'paul@gmail.com', 'password123', false, true);
+INSERT INTO verification_token (id, user_id, token) VALUES (12, 'a2c43ade-742e-40d6-b0b3-a933c29a9d7d', '77c7eef7-16e4-4926-9c07-938e4fb219ad');

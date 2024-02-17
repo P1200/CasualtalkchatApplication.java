@@ -11,6 +11,8 @@ import org.hibernate.validator.constraints.Length;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
+@ToString
 @Entity(name = "account-recovery-page-user-entity")
 @Table(name = "user")
 public class UserEntity {
