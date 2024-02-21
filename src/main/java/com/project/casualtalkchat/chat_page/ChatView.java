@@ -13,7 +13,6 @@ import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.messages.MessageInput;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -137,7 +136,7 @@ public class ChatView extends VerticalLayout {
         messageList.setWidthFull();
         messageList.setHeight(100, Unit.PERCENTAGE);
 
-        MessageInput input = prepareMessageInput(userDetails);
+        CustomMessageInput input = prepareMessageInput(userDetails);
         prepareUploadComponent(input);
         Button searchThroughHistoryButton = preparesearchThroughHistoryButton();
         Div searchBar = prepareSearchBar(searchThroughHistoryButton);
@@ -154,11 +153,10 @@ public class ChatView extends VerticalLayout {
         return chatLayout;
     }
 
-    private MessageInput prepareMessageInput(CustomUserDetails userDetails) {
-        MessageInput input = new MessageInput();
+    private CustomMessageInput prepareMessageInput(CustomUserDetails userDetails) {
+        CustomMessageInput input = new CustomMessageInput();
 
         input.addSubmitListener(submitEvent -> {
-
             MessageDTO messageDTO;
             if (buffer.getFiles().isEmpty()) {
                 messageDTO = MessageDTO.builder()
@@ -277,7 +275,7 @@ public class ChatView extends VerticalLayout {
         setFilteredPageToMessageList(messagesWithPattern.get(currentMessageWithPatternIndex));
     }
 
-    private void prepareUploadComponent(MessageInput input) {
+    private void prepareUploadComponent(CustomMessageInput input) {
         upload.getElement().appendChild(input.getElement());
         upload.setUploadButton(new Button(VaadinIcon.UPLOAD.create()));
         upload.setMaxFileSize(1024 * 1024 * 5);

@@ -44,7 +44,7 @@ class AccountRecoveryListenerTest {
     private JavaMailSender mailSender;
 
     @Test
-    void shouldSendMail() { //TODO replace with integration test
+    void shouldSendMail() {
         //Given
         AccountRecoveryListener accountRecoveryListener = new AccountRecoveryListener(service, messages, mailSender);
         when(service.getUser(anyString())).thenReturn(prepareUserEntity());

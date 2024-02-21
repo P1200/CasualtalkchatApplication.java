@@ -1,0 +1,6 @@
+INSERT INTO `user` (id, username, email, password, is_account_confirmed, is_service_terms_accepted) VALUES ('a2c43ade-742e-40d6-b0b3-a933c29a9d7d', 'Paul', 'paul@gmail.com', 'password123', true, true);
+INSERT INTO `user` (id, username, email, password, is_account_confirmed, is_service_terms_accepted) VALUES ('64550bdc-9162-4efa-8304-2430a0ac8cd9', 'Pablo', 'pablo@gmail.com', 'password123', true, true);
+INSERT INTO `user` (id, username, email, password, is_account_confirmed, is_service_terms_accepted) VALUES ('2ce910d8-d9c5-4b59-ba9c-01bd7c7ab47e', 'Jessica', 'jessy@gmail.com', 'password123', true, true);
+INSERT INTO user_invitations (chat_user_entity_id, invitations_id) VALUES ('a2c43ade-742e-40d6-b0b3-a933c29a9d7d', '64550bdc-9162-4efa-8304-2430a0ac8cd9');
+INSERT INTO user_invitations (chat_user_entity_id, invitations_id) VALUES ('64550bdc-9162-4efa-8304-2430a0ac8cd9', 'a2c43ade-742e-40d6-b0b3-a933c29a9d7d');
+INSERT INTO user_friends (chat_user_entity_id, friends_id) VALUES ('2ce910d8-d9c5-4b59-ba9c-01bd7c7ab47e', '64550bdc-9162-4efa-8304-2430a0ac8cd9');

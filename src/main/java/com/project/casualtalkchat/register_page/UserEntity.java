@@ -3,10 +3,7 @@ package com.project.casualtalkchat.register_page;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +14,8 @@ import java.sql.Date;
 @Setter
 @Builder
 @NoArgsConstructor
+@EqualsAndHashCode
+@ToString
 @Entity(name = "register-page-user-entity")
 @Table(name = "user")
 public class UserEntity {
