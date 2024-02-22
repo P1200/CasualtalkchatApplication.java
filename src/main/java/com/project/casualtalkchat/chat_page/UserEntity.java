@@ -17,7 +17,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity(name = "ChatUserEntity")
 @Table(name = "user")
-public class UserEntity {
+class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

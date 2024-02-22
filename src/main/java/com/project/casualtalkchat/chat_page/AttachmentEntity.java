@@ -12,7 +12,7 @@ import lombok.*;
 @ToString
 @Entity(name = "ChatAttachmentEntity")
 @Table(name = "attachment")
-public class AttachmentEntity {
+class AttachmentEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

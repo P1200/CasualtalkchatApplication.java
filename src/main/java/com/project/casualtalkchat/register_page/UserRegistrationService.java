@@ -18,13 +18,13 @@ public class UserRegistrationService {
     private final VerificationTokenRepository tokenRepository;
     private final UserImagesRepository resourcesRepository;
 
-    public UserEntity registerNewUserAccount(UserEntity user) throws UserAlreadyExistException {
+    UserEntity registerNewUserAccount(UserEntity user) throws UserAlreadyExistException {
         throwExceptionIfUserWithThatEmailExists(user.getEmail());
 
         return userRepository.save(user);
     }
 
-    public UserEntity registerNewUserAccount(UserEntity user, AvatarImage avatar) throws UserAlreadyExistException, FileCouldNotBeSavedException {
+    UserEntity registerNewUserAccount(UserEntity user, AvatarImage avatar) throws UserAlreadyExistException, FileCouldNotBeSavedException {
 
         throwExceptionIfUserWithThatEmailExists(user.getEmail());
 
@@ -36,7 +36,7 @@ public class UserRegistrationService {
         return userRepository.save(user);
     }
 
-    public void saveVerificationTokenForUser (UserEntity user, String token) {
+    void saveVerificationTokenForUser (UserEntity user, String token) {
         VerificationTokenEntity verificationToken = VerificationTokenEntity.builder()
                 .token(token)
                 .user(user)

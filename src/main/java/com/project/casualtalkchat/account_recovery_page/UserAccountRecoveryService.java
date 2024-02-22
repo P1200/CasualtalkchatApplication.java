@@ -14,12 +14,12 @@ public class UserAccountRecoveryService {
     private final UserRepository userRepository;
     private final AccountRecoveryTokenRepository tokenRepository;
 
-    public UserAccountRecoveryService(UserRepository userRepository, AccountRecoveryTokenRepository tokenRepository) {
+    UserAccountRecoveryService(UserRepository userRepository, AccountRecoveryTokenRepository tokenRepository) {
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
     }
 
-    public String getRecoveryTokenForUser(UserEntity user) {
+    String getRecoveryTokenForUser(UserEntity user) {
 
         AccountRecoveryTokenEntity oldRecoveryTokenEntity = tokenRepository.findByUserId(user.getId());
 
@@ -39,7 +39,7 @@ public class UserAccountRecoveryService {
         }
     }
 
-    public UserEntity getUser(String email) {
+    UserEntity getUser(String email) {
         return userRepository.findByEmail(email);
     }
 }
