@@ -15,7 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @ToString
 @Entity(name = "password-change-page-user-entity")
 @Table(name = "user")
-public class UserEntity {
+class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

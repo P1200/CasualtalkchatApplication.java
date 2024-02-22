@@ -1,5 +1,7 @@
 package com.project.casualtalkchat.chat_page;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,16 +10,13 @@ import java.util.List;
 
 @Slf4j
 @Service
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class UserService {
 
     private final UserRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
     @Transactional
-    public void addUserAsInvited(String senderId, UserEntity receiverUserEntity) {
+    void addUserAsInvited(String senderId, UserEntity receiverUserEntity) {
         UserEntity inviter = userRepository.getReferenceById(senderId);
         inviter.getInvitations()
                 .add(receiverUserEntity);
@@ -26,7 +25,7 @@ public class UserService {
     }
 
     @Transactional
-    public void acceptInvitation(String receiverId, UserEntity inviter) {
+    void acceptInvitation(String receiverId, UserEntity inviter) {
         UserEntity user = userRepository.getReferenceById(receiverId);
 
         addUserAsFriend(user, inviter);
@@ -34,32 +33,40 @@ public class UserService {
     }
 
     @Transactional
-    public void removeInvitation(String id, UserEntity inviter) {
+    void removeInvitation(String id, UserEntity inviter) {
         UserEntity user = userRepository.getReferenceById(id);
 
         removeInvitation(user, inviter);
     }
 
-    public List<UserEntity> getAllNonFriendUsers(String userId) {
+    List<UserEntity> getAllNonFriendUsers(String userId) {
         return userRepository.findAllNonFriendUsers(userId);
     }
 
-    public List<UserEntity> getInvitationsToUser(String userId) {
+    List<UserEntity> getInvitationsToUser(String userId) {
         return userRepository.findAllByInvitationsId(userId);
     }
 
-    public List<UserEntity> getAllFriends(String userId) {
+    List<UserEntity> getAllFriends(String userId) {
         return userRepository.findAllFriends(userId);
     }
 
-    public List<UserEntity> getAllFriendsNotParticipatingInChat(String userId, String conversationId) {
+    List<UserEntity> getAllFriendsNotParticipatingInChat(String userId, String conversationId) {
         return userRepository.findAllFriendsNotParticipatingInChat(userId, conversationId);
     }
 
     @Transactional
-    public void removeFriend(String userId, UserEntity friendEntity) {
+    void removeFriend(String userId, UserEntity friendEntity) {
 
         userRepository.removeFriend(userId, friendEntity.getId());
+    }
+
+    List<UserEntity> getAllAdminsInChat(String conversationId) {
+        return userRepository.findAllConversationAdmins(conversationId);
+    }
+
+    List<UserEntity> getAllMembersInChat(String conversationId) {
+        return userRepository.findAllConversationMembers(conversationId);
     }
 
     private void addUserAsFriend(UserEntity user, UserEntity friend) {
@@ -84,13 +91,5 @@ public class UserService {
                 });
 
         userRepository.save(inviterInSession);
-    }
-
-    public List<UserEntity> getAllAdminsInChat(String conversationId) {
-        return userRepository.findAllConversationAdmins(conversationId);
-    }
-
-    public List<UserEntity> getAllMembersInChat(String conversationId) {
-        return userRepository.findAllConversationMembers(conversationId);
     }
 }

@@ -1,17 +1,15 @@
 package com.project.casualtalkchat.account_confirmation_page;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class AccountConfirmationService {
 
     private final VerificationTokenRepository tokenRepository;
     private final UserRepository userRepository;
-
-    public AccountConfirmationService(VerificationTokenRepository tokenRepository, UserRepository userRepository) {
-        this.tokenRepository = tokenRepository;
-        this.userRepository = userRepository;
-    }
 
     public boolean confirmUser(final String userIdAndToken) {
         VerificationTokenEntity tokenEntity = getVerificationTokenEntity(userIdAndToken);

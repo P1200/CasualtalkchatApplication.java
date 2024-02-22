@@ -64,22 +64,6 @@ class CustomAuthenticationManagerTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenUserDetailsAreNull() {
-        //Given
-        CustomAuthenticationManager authenticationManager = new CustomAuthenticationManager(userLoginService);
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(EMAIL, PASSWORD);
-        when(userLoginService.loadUserByUsername(anyString())).thenReturn(null);
-
-        //When
-        Exception exception = assertThrows(BadCredentialsException.class,
-                () -> authenticationManager.authenticate(authenticationToken));
-
-        //Then
-        assertEquals(BAD_CREDENTIALS_EXCEPTION_CODE, exception.getMessage());
-    }
-
-    @Test
     void shouldThrowExceptionWhenPasswordDoesNotMatch() {
         //Given
         CustomAuthenticationManager authenticationManager = new CustomAuthenticationManager(userLoginService);

@@ -31,7 +31,7 @@ public class ConversationService {
     private final UserImagesRepository resourcesRepository;
 
     @Transactional
-    public void createNewConversation(String adminId, UserEntity member) {
+    void createNewConversation(String adminId, UserEntity member) {
 
         UserEntity admin = userRepository.getReferenceById(adminId);
 
@@ -44,23 +44,23 @@ public class ConversationService {
         repository.save(conversation);
     }
 
-    public List<ConversationEntity> getUserConversations(String userId) {
+    List<ConversationEntity> getUserConversations(String userId) {
         return repository.getAllByAdminsIdOrMembersIdSortedByLastMessageSentTime(userId);
     }
 
     @Transactional
-    public void removeConversation(ConversationEntity conversation) {
+    void removeConversation(ConversationEntity conversation) {
         messageRepository.deleteAllByConversationId(conversation.getId());
         repository.delete(conversation);
     }
 
     @Transactional
-    public Page<MessageEntity> getMessagesList(PageRequest pageRequest, String conversationId) {
+    Page<MessageEntity> getMessagesList(PageRequest pageRequest, String conversationId) {
         return messageRepository.getAllByConversationIdOrderBySentTimeDesc(pageRequest, conversationId);
     }
 
     @Transactional
-    public void saveMessage(String conversationId, String senderId, String text, Instant time) {
+    void saveMessage(String conversationId, String senderId, String text, Instant time) {
         ConversationEntity conversation = repository.getReferenceById(conversationId);
 
         UserEntity sender = userRepository.getReferenceById(senderId);
@@ -80,7 +80,7 @@ public class ConversationService {
     }
 
     @Transactional
-    public MessageEntity saveMessage(String conversationId, String senderId, String text, List<Attachment> attachments,
+    MessageEntity saveMessage(String conversationId, String senderId, String text, List<Attachment> attachments,
                             Instant time) throws FileCouldNotBeSavedException {
         ConversationEntity conversation = repository.getReferenceById(conversationId);
 
@@ -104,7 +104,7 @@ public class ConversationService {
         return message;
     }
 
-    public List<Attachment> getMessageAttachmentResources(List<AttachmentEntity> attachmentEntities) {
+    List<Attachment> getMessageAttachmentResources(List<AttachmentEntity> attachmentEntities) {
 
         List<Attachment> attachments = new ArrayList<>();
 
@@ -119,13 +119,13 @@ public class ConversationService {
         return attachments;
     }
 
-    public List<MessageEntity> getMessagesWithPattern(String conversationId, String pattern) {
+    List<MessageEntity> getMessagesWithPattern(String conversationId, String pattern) {
         String wildcardPattern = "%" + pattern + "%";
         return messageRepository.getAllByConversationIdAndContentLikeOrderBySentTimeDesc(conversationId, wildcardPattern);
     }
 
     @Transactional
-    public Page<MessageEntity> getMessagesPageWithSpecificRow(int pageSize, String conversationId, String specificRowId) {
+    Page<MessageEntity> getMessagesPageWithSpecificRow(int pageSize, String conversationId, String specificRowId) {
 
         int position = messageRepository.getMessagePositionInConversationById(conversationId, specificRowId);
         int pageNumber = 0;
@@ -139,33 +139,33 @@ public class ConversationService {
     }
 
     @Transactional
-    public void markConversationAsViewedBy(String currentConversationId, String userId) {
+    void markConversationAsViewedBy(String currentConversationId, String userId) {
         ConversationEntity conversationEntity = repository.getReferenceById(currentConversationId);
         conversationEntity.getMembersWhoNotViewed()
                             .removeIf(member -> userId.equals(member.getId()));
     }
 
     @Transactional
-    public void markMessageAsViewedBy(String conversationId, String userId) {
+    void markMessageAsViewedBy(String conversationId, String userId) {
         MessageEntity messageEntity = messageRepository.getReferenceById(conversationId);
         messageEntity.getMembersWhoNotViewed()
                     .removeIf(member -> userId.equals(member.getId()));
     }
 
     @Transactional
-    public void addUserToConversation(String conversationId, String userId) {
+    void addUserToConversation(String conversationId, String userId) {
         ConversationEntity conversationEntity = repository.getReferenceById(conversationId);
         UserEntity userEntity = userRepository.getReferenceById(userId);
         conversationEntity.getMembers()
                           .add(userEntity);
     }
 
-    public boolean isConversationAdmin(String conversationId, String userId) {
+    boolean isConversationAdmin(String conversationId, String userId) {
         return repository.isConversationAdmin(conversationId, userId);
     }
 
     @Transactional
-    public void removeFromConversation(String conversationId, String userId) {
+    void removeFromConversation(String conversationId, String userId) {
         ConversationEntity conversationEntity = repository.getReferenceById(conversationId);
         UserEntity member = userRepository.getReferenceById(userId);
         conversationEntity.getMembers()

@@ -18,7 +18,7 @@ import java.sql.Date;
 @ToString
 @Entity(name = "register-page-user-entity")
 @Table(name = "user")
-public class UserEntity {
+class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
